@@ -9,15 +9,15 @@ ID PASS LINE_token
 
 def ID_PASS():
     # wifiのssidとパスワード
-    ssid        = 'snow4'
-    password    = '0728244490'
-    # ssid        = 'TKJ'
-    # password    = '19601121'
+    ssid        = 'sxxxw4'
+    password    = '0xxxxx4490'
+    # ssid        = 'TxxJ'
+    # password    = '19xx121'
     return ssid,password
 
 def LINE_token():
     # LINEのトークン設定
-    return '4N4RSrOxn8LRTl9VQBag8J2QwTIXbLoZrmRsG14PH8Q'
+    return '4N4RSrxxxTl9VQBag8J2xxxZrmRsG14PH8Q'
 
 def mqtt_broker():
     # mqttのプローかー名を設定
@@ -26,9 +26,7 @@ def mqtt_broker():
 def ambi():
     # ambientのチャンネルIDとライトキーを設定
     #  ソーズ
-    ch_ID,write_KEY = 64371,"64fd1b3081c33a79"
-    # izumo
-    ch_ID,write_KEY = 52618,"644c8298f2d4a1e4"
+    ch_ID,write_KEY = 6xx71,"64fd1xxx3a79"
     return ch_ID,write_KEY 
 
 def i2c_ini():
