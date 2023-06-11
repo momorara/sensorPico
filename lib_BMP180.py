@@ -172,17 +172,6 @@ class BMP085():
         X2 = (-7357 * p) // 65536
         return (p + (X1 + X2 + 3791) // 16) / 100
 
-    # @property
-    # def altitude(self):
-    #     '''
-    #     Altitude in m.
-    #     '''
-    #     try:
-    #         p = 44330 * (1.0 - math.pow(self.pressure /
-    #                                     self._baseline, 0.1903))
-    #     except:
-    #         p = 0.0
-    #     return p
 
 class BMP180(BMP085):
     def __init__(self, i2c=None):

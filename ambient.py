@@ -118,7 +118,7 @@ def ambient(temp,humi,press,Cds):
     res = am.send({"d1": temp,"d2":humi,"d3":press,"d4":Cds})
 
 def main():
-    temp,humi,press,Cds = 25,55,999,88
+    temp,humi,press,Cds = 25,55,999,80
     ambient(temp,humi,press,Cds)
 
 if __name__=='__main__':

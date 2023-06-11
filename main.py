@@ -14,10 +14,20 @@
 2023/5/20   SSD1306が無くても大丈夫にしたので、プログラムをOLED有無で統合した。
             bootスイッチが押されたらプログラム終了
 2023/5/23   午前1:00にNTPにて時刻合わせ
+2023/6/4    LEDは点滅しているがambientにデータが来ていない事例発生
+            自己リブートをmain.pyに組み込む
+            リブートはAM1:10 に行う
+            thonnyではエラーになるので、main.pyの時にフラグを立てる事とする。
+2023/06/08  main.pyでのリブートループを抜け出せるようにした。
+2023/6/10   wifi 使用/不使用を追加
 """
+
+main_py = 1 # 1の時は自己リブートを有効にする。
+
 import time
 import gc
 import sys
+import machine
 
 import lib_LED
 import wifi_onoff
@@ -35,45 +45,47 @@ ch_ID,write_KEY  = config.ambi()
 """                チャネルID   ライトキー        """
 am = ambient.Ambient(ch_ID, write_KEY)
 """"""""""""""""""""""""""""""""""""""""""""""""""
-
 measu_cycle = config.measu_cycle()
+wifi = config.wifi_set ()
+print( "wifi:",wifi)
 
-def ambient(temp,humi,press,Cds):
-    #res = am.send({"d1": temp})
-    res = am.send({"d1": temp,"d2":humi,"d3":press,"d4":Cds})
+# データがNoneの場合は欠損処理をする
+def ambient(temp,humi,press,Cds ,stat=1):
+    if temp != None and press != None:
+        res = am.send({"d1": temp,"d2":humi,"d3":press,"d4":Cds,"d5": stat })
+    if temp == None and press != None:
+        res = am.send({                     "d3":press,"d4":Cds,"d5": stat })
+    if temp != None and press == None:
+        res = am.send({"d1": temp,"d2":humi,           "d4":Cds,"d5": stat })
+    if temp == None and press == None:
+        res = am.send({                                "d4":Cds,"d5": stat })
 
-# 与えられた3つの数字のうち近い2つの平均を返す。
-# ただし、全ての誤差が0.3未満の場合は、3つの平均をかえす。
-def three2one(x1,x2,x3):
-    ave = (x1 + x2 + x3) /3 
-    dx1ave,dx2ave,dx3ave = abs(ave - x1),abs(ave - x2),abs(ave - x3)
-    #print(dx1ave,dx2ave,dx3ave )
-    print( x1,x2,x3 )
-    if dx1ave < 0.3 and dx2ave < 0.3 and dx3ave < 0.3:
-        if dx1ave > dx2ave :
-            if dx1ave > dx3ave:
-                result = ( x2 + x3 ) / 2
-            else:
-                result = ( x1 + x2 ) / 2
-        else:
-            if dx2ave > dx3ave:
-                result = ( x1 + x3 ) / 2
-            else:
-                result = ( x1 + x2 ) / 2
-    else: 
-        result = ( x1 + x2 + x3 ) / 3
-    return int(result*10+0.5) / 10
+def ambient_stat(stat):
+    try:
+        res = am.send({"d5": stat})
+    except:
+        pass
 
+# エラーが2回続けば、データ欠損として、Noneとする。
 def keisoku():
     try:
         temp1,humi1 = lib_AHT10.aht10(1)
+        time.sleep(1)
     except:
-        temp1,humi1 = 300,-110
+        time.sleep(3)
+        try:
+            temp1,humi1 = lib_AHT10.aht10(1)
+        except:
+            temp1,humi1 = None,None
     try:
         temp,press1 = lib_BMP180.BMP180(1)
+        time.sleep(1)
     except:
-        press1 = 600
-    time.sleep(5)
+        time.sleep(3)
+        try:
+            temp,press1 = lib_BMP180.BMP180(1)
+        except:
+            temp,press1 = None,None
     return press1,temp1,humi1
 
 # bootSWの状態を見る
@@ -90,10 +102,13 @@ def bootSW():
 def main():
     lib_LED.LEDonoff()
     # wifi 接続
-    wifi_onoff.wifi_onoff('on')
-    # NTP にて時刻合わせ
-    lib_NTP.NTP_set()
-    lib_LED.LEDonoff()
+    if wifi == 1:
+        wifi_onoff.wifi_onoff('on')
+        # NTP にて時刻合わせ
+        lib_NTP.NTP_set()
+        lib_LED.LEDonoff()
+        lib_LED.end_LED()
+    ambient_stat(9)        # テスト　9
 
     try:
         temp,humi,press = 0,0,0
@@ -101,25 +116,16 @@ def main():
     except:
         pass
 
+    UTC_OFFSET = 9 * 60 * 60
     while True:
-         # 5秒毎に計測し、ハズレ値を外して平均する。
-        press1,temp1,humi1 = keisoku()
-        press2,temp2,humi2 = keisoku()
-        press3,temp3,humi3 = keisoku()
-        temp  = three2one(temp1,temp2,temp3)
-        humi  = three2one(humi1,humi2,humi3) 
-        press = three2one(press1,press2,press3)
 
-        if temp  > 100: temp  = 100
-        if humi  <   0: humi  = 0
-        if press < 900: press = 600
+        press,temp,humi = keisoku()
 
         Cds = lib_Cds.Cds(1)
-
-        UTC_OFFSET = 9 * 60 * 60
+        
         now = time.localtime(time.time() + UTC_OFFSET)
         print(now)
-        print('気温:',temp,'　湿度:',humi,'　気圧:',press,'　明暗:',Cds)
+        print('気温:',temp,' 湿度:',humi,' 気圧:',press,' 明暗:',Cds)
 
         print(time.localtime()[3] )
 
@@ -133,9 +139,17 @@ def main():
             try:
                 ambient(temp,humi,press,Cds)
             except:
-                print('err ambient')
+                print('err ambient1')
+                if main_py == 1:
+                    # リブート
+                    machine.reset()
         else:
+            try:
+                ambient(temp,humi,press,Cds) # とりあえず投げてみる
+            except:
+                print('err ambient1')
             print('pass ambient')
+            ambient_stat(11)       # テスト　11
 
 
         # 次の毎正分まで待つ
@@ -169,16 +183,50 @@ def main():
                 sys.exit()
         print('%')
 
-        # 午前1:00にNTPにて時刻合わせ +9:00なので 16
-        if time.localtime()[3] == 16:
-            if time.localtime()[4] == 0:
-                try:
-                    lib_NTP.NTP_set()
-                except:
-                    pass
+        now = time.localtime(time.time() + UTC_OFFSET)
+        print("Time",now[3],":",now[4])
+        # 午前1:10にリブート +9:00しているので、補正すること
+        if now[3] == 1 and now[4] == 10: #1:10
+            try:
+                time.sleep(5) 
+                ambient_stat(10)        # テスト　10
+                if main_py == 1:
+                    time.sleep(60)      #最悪でも繰り返さない
+                    # リブート
+                    machine.reset()
+                lib_NTP.NTP_set()
+                time.sleep(60)          # テスト
+                ambient_stat(5)         # テスト　5
+                print("NTP")
+            except:
+                pass
 
         gc.collect()
+        time.sleep(2)
 
          
 if __name__=='__main__':
-    main()
+    try:
+        main()
+    except:
+        time.sleep(2)
+        print("main-try /main_py:",main_py)
+        # 想定されていないエラーが発生してmainがこけた場合
+        # ここに来て、リブートするが、エラーが継続している場合ループしてしまう。
+        # そんな時は、リブートする前にbootスイッチを押すことで、プログラムを終了させる。
+        for i in range(10):
+            if bootSW() == 1:
+                #print(bootSW())
+                lib_LED.end_LED()
+                sys.exit()
+                main_py = 0
+            lib_LED.LEDonoff()
+            time.sleep(1)
+            ambient_stat(8)
+            print("main-try /i:", i)
+        if main_py == 1:
+            print("main-try / リブート")
+            ambient_stat(7) 
+            time.sleep(5)
+            # リブート
+            machine.reset()
