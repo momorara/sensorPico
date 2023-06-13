@@ -20,6 +20,7 @@
             thonnyではエラーになるので、main.pyの時にフラグを立てる事とする。
 2023/06/08  main.pyでのリブートループを抜け出せるようにした。
 2023/6/10   wifi 使用/不使用を追加
+2023/6/13   OLEDメッセージ表示
 """
 
 main_py = 1 # 1の時は自己リブートを有効にする。
@@ -38,6 +39,7 @@ import lib_AHT10
 import lib_Cds
 import SSD1306
 import lib_NTP
+import lib_CPUtemp
 
 import ambient
 # Ambient対応 
@@ -50,15 +52,15 @@ wifi = config.wifi_set ()
 print( "wifi:",wifi)
 
 # データがNoneの場合は欠損処理をする
-def ambient(temp,humi,press,Cds ,stat=1):
+def ambient(temp,humi,press,Cds ,temp_cpu,stat=1):
     if temp != None and press != None:
-        res = am.send({"d1": temp,"d2":humi,"d3":press,"d4":Cds,"d5": stat })
+        res = am.send({"d1": temp,"d2":humi,"d3":press,"d4":Cds,"d5": stat,"d6":temp_cpu })
     if temp == None and press != None:
-        res = am.send({                     "d3":press,"d4":Cds,"d5": stat })
+        res = am.send({                     "d3":press,"d4":Cds,"d5": stat,"d6":temp_cpu })
     if temp != None and press == None:
-        res = am.send({"d1": temp,"d2":humi,           "d4":Cds,"d5": stat })
+        res = am.send({"d1": temp,"d2":humi,           "d4":Cds,"d5": stat,"d6":temp_cpu })
     if temp == None and press == None:
-        res = am.send({                                "d4":Cds,"d5": stat })
+        res = am.send({                                "d4":Cds,"d5": stat,"d6":temp_cpu })
 
 def ambient_stat(stat):
     try:
@@ -101,43 +103,37 @@ def bootSW():
 
 def main():
     lib_LED.LEDonoff()
+    temp,humi,press = 0,0,0
+    SSD1306.OLED(temp,humi,press)
     # wifi 接続
+    ip_add = "no connect"
     if wifi == 1:
-        wifi_onoff.wifi_onoff('on')
+        ip_add = wifi_onoff.wifi_onoff('on')
         # NTP にて時刻合わせ
         lib_NTP.NTP_set()
         lib_LED.LEDonoff()
         lib_LED.end_LED()
+    print("ip:",ip_add)
+    SSD1306.OLED_mes(ip_add)
+    time.sleep(3)
     ambient_stat(9)        # テスト　9
-
-    try:
-        temp,humi,press = 0,0,0
-        SSD1306.OLED(temp,humi,press)
-    except:
-        pass
 
     UTC_OFFSET = 9 * 60 * 60
     while True:
-
+        # センサー測定
         press,temp,humi = keisoku()
-
         Cds = lib_Cds.Cds(1)
+        temp_cpu = lib_CPUtemp.CPU_temp()
         
         now = time.localtime(time.time() + UTC_OFFSET)
         print(now)
-        print('気温:',temp,' 湿度:',humi,' 気圧:',press,' 明暗:',Cds)
+        print('気温:',temp,' 湿度:',humi,' 気圧:',press,' 明暗:',Cds,'　cpuTEMP',temp_cpu)
+        SSD1306.OLED(temp,humi,press)
 
-        print(time.localtime()[3] )
-
-        try:
-            SSD1306.OLED(temp,humi,press)
-        except:
-            pass
-        
         # 1つでもエラー値があれば、amientに投げない
         if press != 600 and temp != 100 and humi != 0:
             try:
-                ambient(temp,humi,press,Cds)
+                ambient(temp,humi,press,Cds,temp_cpu)
             except:
                 print('err ambient1')
                 if main_py == 1:
@@ -145,12 +141,11 @@ def main():
                     machine.reset()
         else:
             try:
-                ambient(temp,humi,press,Cds) # とりあえず投げてみる
+                ambient(temp,humi,press,Cds,temp_cpu) # とりあえず投げてみる
             except:
                 print('err ambient1')
             print('pass ambient')
             ambient_stat(11)       # テスト　11
-
 
         # 次の毎正分まで待つ
         now = time.localtime()
@@ -186,29 +181,33 @@ def main():
         now = time.localtime(time.time() + UTC_OFFSET)
         print("Time",now[3],":",now[4])
         # 午前1:10にリブート +9:00しているので、補正すること
-        if now[3] == 1 and now[4] == 10: #1:10
+        if now[3] == 5 and now[4] == 50: #5:50
             try:
                 time.sleep(5) 
                 ambient_stat(10)        # テスト　10
                 if main_py == 1:
+                    SSD1306.OLED_mes("reboot time")
                     time.sleep(60)      #最悪でも繰り返さない
                     # リブート
                     machine.reset()
                 lib_NTP.NTP_set()
+                SSD1306.OLED_mes("NTP")
                 time.sleep(60)          # テスト
                 ambient_stat(5)         # テスト　5
                 print("NTP")
             except:
                 pass
 
-        gc.collect()
+        gc.collect()  #ガーベージコレクション
         time.sleep(2)
 
          
 if __name__=='__main__':
+    # main()
     try:
         main()
     except:
+        SSD1306.OLED_mes("main err")
         time.sleep(2)
         print("main-try /main_py:",main_py)
         # 想定されていないエラーが発生してmainがこけた場合
@@ -224,7 +223,10 @@ if __name__=='__main__':
             time.sleep(1)
             ambient_stat(8)
             print("main-try /i:", i)
+            mes = "main-try /i:" + str(i)
+            SSD1306.OLED_mes(mes)
         if main_py == 1:
+            SSD1306.OLED_mes("reboot")
             print("main-try / リブート")
             ambient_stat(7) 
             time.sleep(5)

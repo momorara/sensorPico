@@ -6,6 +6,7 @@ wifiのon-offを行う
 osはいないので、やってくれないよ!!
 2023/5/7    lib化
 2023/05/20  設定ファィルをconfig.pyとした
+2023/06/11  ip_addressを返す
 """
 import urequests as requests
 import network
@@ -32,13 +33,16 @@ def wifi_onoff(mode):
             max_wait -= 1
             print('waiting for connection...')
             utime.sleep(1)
+        status = wlan.ifconfig()
+        # print( 'ip = ' + status[0] )
+        return status[0]
     else:
         # wifiの電源を切る
         machine.Pin(23, machine.Pin.OUT).low()
     
 
 def main():
-    wifi_onoff('on')
+    print("ip:",wifi_onoff('on'))
 
 if __name__=='__main__':
     main()
