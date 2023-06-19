@@ -10,14 +10,13 @@
 """
 2023/05/20  設定ファィルをconfig.pyとした
 """
-
-# センサー補正値
-T_hosei = 0.0
-H_hosei = 0.0
-
 import time
 from machine import I2C,Pin
 import config
+
+
+# センサー補正値
+T_hosei,H_hosei,P_hosei = config.hosei()
 
 i2c_no,SDA_pin = config.i2c_ini()
 

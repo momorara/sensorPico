@@ -27,9 +27,8 @@ THE SOFTWARE.
 '''
 import config
 i2c_no,SDA_pin = config.i2c_ini()
-
 # センサー補正値
-hosei = -2.4
+T_hosei,H_hosei,P_hosei = config.hosei()
 
 from ustruct import unpack as unp
 import math
@@ -195,9 +194,9 @@ def BMP180(flag):
     temp_f= (tempC * (9/5) + 32)   #convert the temperature value in fahrenheit
     tempC  = int(tempC*10 +0.1)/10
     pres_hPa_org = pres_hPa
-    pres_hPa  = int(pres_hPa*10 +0.1)/10 + hosei
+    pres_hPa  = int(pres_hPa*10 +0.1)/10 + P_hosei
     if flag == 0:
-        print(pres_hPa_org,pres_hPa,hosei)
+        print(pres_hPa_org,pres_hPa,P_hosei)
     return tempC,pres_hPa
 
 def main():
