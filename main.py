@@ -20,10 +20,11 @@
             thonnyではエラーになるので、main.pyの時にフラグを立てる事とする。
 2023/06/08  main.pyでのリブートループを抜け出せるようにした。
 2023/6/10   wifi 使用/不使用を追加
-2023/6/13   OLEDメッセージ表示
+2023/6/13   OLEDメッセージ表示、cpu温度追加
+2023/6/17   データエラーの場合999ではなく、欠損とする。
 """
 
-main_py = 1 # 1の時は自己リブートを有効にする。
+main_py = 0 # 1の時は自己リブートを有効にする。
 
 import time
 import gc
@@ -124,6 +125,14 @@ def main():
         press,temp,humi = keisoku()
         Cds = lib_Cds.Cds(1)
         temp_cpu = lib_CPUtemp.CPU_temp()
+
+        # 999って値が表示されたので、その場合は欠損とする。
+        if temp > 100 :
+            temp = None
+            ambient_stat(21) 
+        if humi > 100 :
+            humi = None
+            ambient_stat(22) 
         
         now = time.localtime(time.time() + UTC_OFFSET)
         print(now)
@@ -136,6 +145,7 @@ def main():
                 ambient(temp,humi,press,Cds,temp_cpu)
             except:
                 print('err ambient1')
+                ambient_stat(20) 
                 if main_py == 1:
                     # リブート
                     machine.reset()
