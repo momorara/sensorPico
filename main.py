@@ -22,6 +22,7 @@
 2023/6/10   wifi 使用/不使用を追加
 2023/6/13   OLEDメッセージ表示、cpu温度追加
 2023/6/17   データエラーの場合999ではなく、欠損とする。
+2023/7/01   cpuT-気温 をambient d7に投げる
 """
 
 main_py = 0 # 1の時は自己リブートを有効にする。
@@ -53,15 +54,16 @@ wifi = config.wifi_set ()
 print( "wifi:",wifi)
 
 # データがNoneの場合は欠損処理をする
-def ambient(temp,humi,press,Cds ,temp_cpu,stat=1):
+def ambient(temp,humi,press,Cds ,temp_cpu,temp_diff,stat=1):
+    #return
     if temp != None and press != None:
-        res = am.send({"d1": temp,"d2":humi,"d3":press,"d4":Cds,"d5": stat,"d6":temp_cpu })
+        res = am.send({"d1": temp,"d2":humi,"d3":press,"d4":Cds,"d5": stat,"d6":temp_cpu,"d7":temp_diff })
     if temp == None and press != None:
-        res = am.send({                     "d3":press,"d4":Cds,"d5": stat,"d6":temp_cpu })
+        res = am.send({                     "d3":press,"d4":Cds,"d5": stat,"d6":temp_cpu,"d7":temp_diff })
     if temp != None and press == None:
-        res = am.send({"d1": temp,"d2":humi,           "d4":Cds,"d5": stat,"d6":temp_cpu })
+        res = am.send({"d1": temp,"d2":humi,           "d4":Cds,"d5": stat,"d6":temp_cpu,"d7":temp_diff })
     if temp == None and press == None:
-        res = am.send({                                "d4":Cds,"d5": stat,"d6":temp_cpu })
+        res = am.send({                                "d4":Cds,"d5": stat,"d6":temp_cpu,"d7":temp_diff })
 
 def ambient_stat(stat):
     try:
@@ -125,6 +127,7 @@ def main():
         press,temp,humi = keisoku()
         Cds = lib_Cds.Cds(1)
         temp_cpu = lib_CPUtemp.CPU_temp()
+        temp_diff = int((temp_cpu - temp)*10+0.5)/10
 
         # 999って値が表示されたので、その場合は欠損とする。
         if temp > 100 :
@@ -136,13 +139,13 @@ def main():
         
         now = time.localtime(time.time() + UTC_OFFSET)
         print(now)
-        print('気温:',temp,' 湿度:',humi,' 気圧:',press,' 明暗:',Cds,'　cpuTEMP',temp_cpu)
+        print('気温:',temp,' 湿度:',humi,' 気圧:',press,' 明暗:',Cds,'　cpuTEMP',temp_cpu," deff",temp_diff)
         SSD1306.OLED(temp,humi,press)
 
         # 1つでもエラー値があれば、amientに投げない
         if press != 600 and temp != 100 and humi != 0:
             try:
-                ambient(temp,humi,press,Cds,temp_cpu)
+                ambient(temp,humi,press,Cds,temp_cpu,temp_diff)
             except:
                 print('err ambient1')
                 ambient_stat(20) 
@@ -151,7 +154,7 @@ def main():
                     machine.reset()
         else:
             try:
-                ambient(temp,humi,press,Cds,temp_cpu) # とりあえず投げてみる
+                ambient(temp,humi,press,Cds,temp_cpu,temp_diff) # とりあえず投げてみる
             except:
                 print('err ambient1')
             print('pass ambient')

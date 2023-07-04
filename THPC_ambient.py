@@ -22,6 +22,8 @@
 2023/6/10   wifi 使用/不使用を追加
 2023/6/13   OLEDメッセージ表示、cpu温度追加
 2023/6/17   データエラーの場合999ではなく、欠損とする。
+2023/7/01   cpuT-気温 をambient d7に投げる
+2023/7/04   cpuT-気温のmaxとminの差を表示する
 """
 
 main_py = 0 # 1の時は自己リブートを有効にする。
@@ -52,16 +54,20 @@ measu_cycle = config.measu_cycle()
 wifi = config.wifi_set ()
 print( "wifi:",wifi)
 
+
+
+
 # データがNoneの場合は欠損処理をする
-def ambient(temp,humi,press,Cds ,temp_cpu,stat=1):
+def ambient(temp,humi,press,Cds ,temp_cpu,temp_diff,stat=1):
+    #return
     if temp != None and press != None:
-        res = am.send({"d1": temp,"d2":humi,"d3":press,"d4":Cds,"d5": stat,"d6":temp_cpu })
+        res = am.send({"d1": temp,"d2":humi,"d3":press,"d4":Cds,"d5": stat,"d6":temp_cpu,"d7":temp_diff })
     if temp == None and press != None:
-        res = am.send({                     "d3":press,"d4":Cds,"d5": stat,"d6":temp_cpu })
+        res = am.send({                     "d3":press,"d4":Cds,"d5": stat,"d6":temp_cpu,"d7":temp_diff })
     if temp != None and press == None:
-        res = am.send({"d1": temp,"d2":humi,           "d4":Cds,"d5": stat,"d6":temp_cpu })
+        res = am.send({"d1": temp,"d2":humi,           "d4":Cds,"d5": stat,"d6":temp_cpu,"d7":temp_diff })
     if temp == None and press == None:
-        res = am.send({                                "d4":Cds,"d5": stat,"d6":temp_cpu })
+        res = am.send({                                "d4":Cds,"d5": stat,"d6":temp_cpu,"d7":temp_diff })
 
 def ambient_stat(stat):
     try:
@@ -103,6 +109,13 @@ def bootSW():
         return 0
 
 def main():
+    # maxとminをファィルから読み取る
+# ファイルからデータを読み出す
+    with open('data_max.txt', 'r') as f:
+        max = int(f.read())
+    with open('data_min.txt', 'r') as f:
+        min = int(f.read())
+
     lib_LED.LEDonoff()
     temp,humi,press = 0,0,0
     SSD1306.OLED(temp,humi,press)
@@ -125,6 +138,9 @@ def main():
         press,temp,humi = keisoku()
         Cds = lib_Cds.Cds(1)
         temp_cpu = lib_CPUtemp.CPU_temp()
+        temp_diff = int((temp_cpu - temp)*10+0.5)/10
+        if max < temp_diff: max = temp_diff
+        if min > temp_diff: min = temp_diff
 
         # 999って値が表示されたので、その場合は欠損とする。
         if temp > 100 :
@@ -136,22 +152,27 @@ def main():
         
         now = time.localtime(time.time() + UTC_OFFSET)
         print(now)
-        print('気温:',temp,' 湿度:',humi,' 気圧:',press,' 明暗:',Cds,'　cpuTEMP',temp_cpu)
+        print('気温:',temp,' 湿度:',humi,' 気圧:',press,' 明暗:',Cds,' cpuTEMP:',temp_cpu," deff_T:",temp_diff,round(max-min, 1))
         SSD1306.OLED(temp,humi,press)
 
         # 1つでもエラー値があれば、amientに投げない
         if press != 600 and temp != 100 and humi != 0:
             try:
-                ambient(temp,humi,press,Cds,temp_cpu)
+                ambient(temp,humi,press,Cds,temp_cpu,temp_diff)
             except:
                 print('err ambient1')
                 ambient_stat(20) 
                 if main_py == 1:
+                    # ファイルにデータを書き込む
+                    with open('data_max.txt', 'w') as f:
+                        f.write(str(max))
+                    with open('data_min.txt', 'w') as f:
+                        f.write(str(min))
                     # リブート
                     machine.reset()
         else:
             try:
-                ambient(temp,humi,press,Cds,temp_cpu) # とりあえず投げてみる
+                ambient(temp,humi,press,Cds,temp_cpu,temp_diff) # とりあえず投げてみる
             except:
                 print('err ambient1')
             print('pass ambient')
@@ -198,6 +219,11 @@ def main():
                 if main_py == 1:
                     SSD1306.OLED_mes("reboot time")
                     time.sleep(60)      #最悪でも繰り返さない
+                    # ファイルにデータを書き込む
+                    with open('data_max.txt', 'w') as f:
+                        f.write(str(max))
+                    with open('data_min.txt', 'w') as f:
+                        f.write(str(min))
                     # リブート
                     machine.reset()
                 lib_NTP.NTP_set()
@@ -213,7 +239,7 @@ def main():
 
          
 if __name__=='__main__':
-    # main()
+    main()
     try:
         main()
     except:
@@ -240,5 +266,10 @@ if __name__=='__main__':
             print("main-try / リブート")
             ambient_stat(7) 
             time.sleep(5)
+            # ファイルにデータを書き込む
+            with open('data_max.txt', 'w') as f:
+                f.write(str(max))
+            with open('data_min.txt', 'w') as f:
+                f.write(str(min))
             # リブート
             machine.reset()
