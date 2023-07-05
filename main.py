@@ -25,7 +25,7 @@
 2023/7/01   cpuT-気温 をambient d7に投げる
 """
 
-main_py = 0 # 1の時は自己リブートを有効にする。
+main_py = 1 # 1の時は自己リブートを有効にする。
 
 import time
 import gc
@@ -52,6 +52,9 @@ am = ambient.Ambient(ch_ID, write_KEY)
 measu_cycle = config.measu_cycle()
 wifi = config.wifi_set ()
 print( "wifi:",wifi)
+
+
+
 
 # データがNoneの場合は欠損処理をする
 def ambient(temp,humi,press,Cds ,temp_cpu,temp_diff,stat=1):
@@ -139,7 +142,7 @@ def main():
         
         now = time.localtime(time.time() + UTC_OFFSET)
         print(now)
-        print('気温:',temp,' 湿度:',humi,' 気圧:',press,' 明暗:',Cds,'　cpuTEMP',temp_cpu," deff",temp_diff)
+        print('気温:',temp,' 湿度:',humi,' 気圧:',press,' 明暗:',Cds,' cpuTEMP:',temp_cpu," deff_T:",temp_diff)
         SSD1306.OLED(temp,humi,press)
 
         # 1つでもエラー値があれば、amientに投げない
@@ -238,6 +241,7 @@ if __name__=='__main__':
             print("main-try /i:", i)
             mes = "main-try /i:" + str(i)
             SSD1306.OLED_mes(mes)
+
         if main_py == 1:
             SSD1306.OLED_mes("reboot")
             print("main-try / リブート")
