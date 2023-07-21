@@ -7,6 +7,7 @@
             0:オリジナルデータが見える
             最大明るい、最大暗い時のデータをCds max,minに代入する。
 2023/05/21  設定値をconfig.pyから取得
+v1.0
 """
 from machine import ADC, Pin
 import time

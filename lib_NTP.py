@@ -2,6 +2,7 @@
 #!/usr/bin/python3
 """
 2023/05/21  NTPにて時刻あわせ
+v1.0
 """
 
 def NTP_set():

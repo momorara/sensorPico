@@ -23,8 +23,10 @@
 2023/6/13   OLEDメッセージ表示、cpu温度追加
 2023/6/17   データエラーの場合999ではなく、欠損とする。
 2023/7/01   cpuT-気温 をambient d7に投げる
+2023/07/14  エラー時のambientを3段階にする
+2023/07/15  ambient_statの前後に10秒のsleepを入れた、stat noの整理
+v1.0
 """
-
 main_py = 0 # 1の時は自己リブートを有効にする。
 
 import time
@@ -52,9 +54,6 @@ am = ambient.Ambient(ch_ID, write_KEY)
 measu_cycle = config.measu_cycle()
 wifi = config.wifi_set ()
 print( "wifi:",wifi)
-
-
-
 
 # データがNoneの場合は欠損処理をする
 def ambient(temp,humi,press,Cds ,temp_cpu,temp_diff,stat=1):
@@ -121,8 +120,9 @@ def main():
         lib_LED.end_LED()
     print("ip:",ip_add)
     SSD1306.OLED_mes(ip_add)
-    time.sleep(3)
-    ambient_stat(9)        # テスト　9
+    time.sleep(10)
+    ambient_stat(10)        # テスト　10
+    time.sleep(10)
 
     UTC_OFFSET = 9 * 60 * 60
     while True:
@@ -135,10 +135,14 @@ def main():
         # 999って値が表示されたので、その場合は欠損とする。
         if temp > 100 :
             temp = None
-            ambient_stat(21) 
+            time.sleep(10)
+            ambient_stat(6) 
+            time.sleep(10)
         if humi > 100 :
             humi = None
-            ambient_stat(22) 
+            time.sleep(10)
+            ambient_stat(7) 
+            time.sleep(10)
         
         now = time.localtime(time.time() + UTC_OFFSET)
         print(now)
@@ -149,19 +153,42 @@ def main():
         if press != 600 and temp != 100 and humi != 0:
             try:
                 ambient(temp,humi,press,Cds,temp_cpu,temp_diff)
-            except:
-                print('err ambient1')
-                ambient_stat(20) 
-                if main_py == 1:
-                    # リブート
-                    machine.reset()
+                time.sleep(10)
+            except:  
+                time.sleep(10)
+                ambient_stat(2)
+                time.sleep(10)
+                try:
+                    ambient(temp,humi,press,Cds,temp_cpu,temp_diff)
+                    time.sleep(10)
+                except:
+                    time.sleep(60)
+                    ambient_stat(3)
+                    time.sleep(10)
+                    try:
+                        ambient(temp,humi,press,Cds,temp_cpu,temp_diff)
+                        time.sleep(10)
+                    except:
+                        time.sleep(10)
+                        print('err ambient1')
+                        ambient_stat(4) 
+                        time.sleep(10)
+                        if main_py == 1:
+                            # リブート
+                            machine.reset()
         else:
             try:
+                time.sleep(10)
+                ambient_stat(8)
+                time.sleep(10)
                 ambient(temp,humi,press,Cds,temp_cpu,temp_diff) # とりあえず投げてみる
+                time.sleep(10)
             except:
                 print('err ambient1')
+                time.sleep(10)
+                ambient_stat(9)       # テスト　9
+                time.sleep(10)
             print('pass ambient')
-            ambient_stat(11)       # テスト　11
 
         # 次の毎正分まで待つ
         now = time.localtime()
@@ -199,8 +226,9 @@ def main():
         # 午前1:10にリブート +9:00しているので、補正すること
         if now[3] == 5 and now[4] == 50: #5:50
             try:
-                time.sleep(5) 
-                ambient_stat(10)        # テスト　10
+                time.sleep(6) 
+                ambient_stat(11)        # テスト　11
+                time.sleep(10)
                 if main_py == 1:
                     SSD1306.OLED_mes("reboot time")
                     time.sleep(60)      #最悪でも繰り返さない
@@ -210,9 +238,12 @@ def main():
                 SSD1306.OLED_mes("NTP")
                 time.sleep(60)          # テスト
                 ambient_stat(5)         # テスト　5
+                time.sleep(10)
                 print("NTP")
             except:
-                pass
+                time.sleep(10)
+                ambient_stat(14)         # テスト　14
+                time.sleep(10)
 
         gc.collect()  #ガーベージコレクション
         time.sleep(2)
@@ -223,6 +254,9 @@ if __name__=='__main__':
     try:
         main()
     except:
+        time.sleep(10)
+        ambient_stat(12)
+        time.sleep(10)
         SSD1306.OLED_mes("main err")
         time.sleep(2)
         print("main-try /main_py:",main_py)
@@ -236,16 +270,33 @@ if __name__=='__main__':
                 sys.exit()
                 main_py = 0
             lib_LED.LEDonoff()
-            time.sleep(1)
-            ambient_stat(8)
             print("main-try /i:", i)
             mes = "main-try /i:" + str(i)
             SSD1306.OLED_mes(mes)
 
         if main_py == 1:
+            time.sleep(10)
+            ambient_stat(13) 
+            time.sleep(10)
             SSD1306.OLED_mes("reboot")
             print("main-try / リブート")
-            ambient_stat(7) 
-            time.sleep(5)
             # リブート
             machine.reset()
+
+"""
+ambient_statによるエラー情報等の表示
+1 通常
+2 ambient送信異常 1回目
+3 ambient送信異常 2回目
+4 ambient送信異常 3回目
+5 定時リブート未実行時NTP
+6 温度異常
+7 湿度異常
+8 データ異常時のambient送信
+9 データ異常時のambient送信異常
+10 main start
+11 定時リブート
+12 mainエラー
+13 mainエラー時のリブート
+14 定時リブート失敗
+"""

@@ -1,4 +1,4 @@
-
+v1.0
 """
 https://github.com/vjsyong/AHT10/blob/master/aht10.py
 をpico W 用に改造した。

@@ -1,3 +1,6 @@
+#
+# v1.0
+
 import machine
 import time
 led = machine.Pin('LED', machine.Pin.OUT)

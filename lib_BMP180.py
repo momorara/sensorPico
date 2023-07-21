@@ -24,6 +24,7 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 
 2023/5/20   設定ファィルをconfig.pyとした
+v1.0
 '''
 import config
 i2c_no,SDA_pin = config.i2c_ini()

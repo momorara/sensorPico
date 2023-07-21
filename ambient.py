@@ -1,3 +1,5 @@
+# v1.0
+
 class Ambient:
     def __init__(self, channelId, writeKey, readKey=None, userKey=None, ssl=False, debug=False):
         try:

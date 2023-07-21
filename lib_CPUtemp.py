@@ -4,6 +4,7 @@ https://sozorablog.com/raspberry-pi-pico-w-review/
 のプログラムをmainから呼び出す関数としました。
 
 CPUの持つ温度をシェルに表示
+v1.0
 """
 import machine
 import utime

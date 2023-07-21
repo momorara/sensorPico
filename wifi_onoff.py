@@ -7,6 +7,7 @@ osはいないので、やってくれないよ!!
 2023/5/7    lib化
 2023/05/20  設定ファィルをconfig.pyとした
 2023/06/11  ip_addressを返す
+v1.0
 """
 import urequests as requests
 import network

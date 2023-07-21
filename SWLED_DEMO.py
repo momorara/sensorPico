@@ -2,6 +2,7 @@
  2023/06/07
   基板上のタクトスイッチとLED の動作DEMO
    タクトスイッチを押すと点滅していたLED が 2秒間両方点灯する。
+   v1.0
 """
 import machine
 import time

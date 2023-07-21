@@ -1,6 +1,7 @@
 """
 2023/05/10
 2023/05/21	OLED 焼き付け防止
+v1.0
 """
 import time
 from machine import Pin, I2C

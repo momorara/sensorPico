@@ -5,6 +5,7 @@ https://sozorablog.com/raspberry-pi-pico-w-review/
 2023/04/28 lib_id_pass.py を使用
 
 プラウザで表示されたIPアドレスをアクセスするとボタンが出ます。
+v1.0
 """
 import time
 import network

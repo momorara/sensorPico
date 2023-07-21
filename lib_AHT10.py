@@ -9,6 +9,7 @@
 
 """
 2023/05/20  設定ファィルをconfig.pyとした
+v1.0
 """
 import time
 from machine import I2C,Pin
