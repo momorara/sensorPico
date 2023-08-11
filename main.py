@@ -26,6 +26,8 @@
 2023/07/14  エラー時のambientを3段階にする
 2023/07/15  ambient_statの前後に10秒のsleepを入れた、stat noの整理
 v1.0
+2023/08/11  初期設定でも最低限の動作をするように改造
+v1.1
 """
 main_py = 1 # 1の時は自己リブートを有効にする。
 
@@ -109,6 +111,7 @@ def bootSW():
 def main():
     lib_LED.LEDonoff()
     temp,humi,press = 0,0,0
+    press,temp,humi = keisoku()
     SSD1306.OLED(temp,humi,press)
     # wifi 接続
     ip_add = "no connect"

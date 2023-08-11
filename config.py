@@ -8,12 +8,15 @@ ID PASS LINE_token
 2023/6/10   wifi 使用/不使用を追加
 2023/6/19   補正値を持つ
 v1.0
+2023/8/11   ambient testチャンネル対応
+v1.1        初期設定でも最低限の動作をするように改造
 """
 def wifi_set():
     return 1 # wifi使用しない時は0
 
 def ID_PASS():
     # wifiのssidとパスワード
+    # あなたのwifiの設定に変更してください。
     ssid        = 'your ssid'
     password    = 'your password'
     return ssid,password
@@ -26,8 +29,9 @@ def hosei():
     return temp,humdi,press
 
 def ambi():
-    # ambientのチャンネルIDとライトキーを設定
-    ch_ID,write_KEY = 64xx1,"64fdxxxx33a79"
+    # ambientのテストチャンネル ID,ライトキー
+    # ご自身のambient設定に変更してください。
+    ch_ID,write_KEY = 49384,"bd093681d1a5a2c8"
     return ch_ID,write_KEY 
 
 def i2c_ini():
