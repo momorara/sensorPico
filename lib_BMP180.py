@@ -203,6 +203,7 @@ def BMP180(flag):
 def main():
     for i in range(10):
         try:
+            # flag 0:データプリント 1:データプリントしない
             temp,press = BMP180(0)
             print(temp,press)
         except:

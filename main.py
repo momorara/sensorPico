@@ -28,6 +28,8 @@
 v1.0
 2023/08/11  初期設定でも最低限の動作をするように改造
 v1.1
+2023/08/17  pico用にBMP180 と BMP280 を意識せずに使えるようにした
+v1.2
 """
 main_py = 1 # 1の時は自己リブートを有効にする。
 
@@ -40,7 +42,7 @@ import lib_LED
 import wifi_onoff
 import config
 
-import lib_BMP180
+import lib_BMP1280
 import lib_AHT10
 import lib_Cds
 import SSD1306
@@ -87,12 +89,12 @@ def keisoku():
         except:
             temp1,humi1 = None,None
     try:
-        temp,press1 = lib_BMP180.BMP180(1)
+        temp,press1 = lib_BMP1280.BMP()
         time.sleep(1)
     except:
         time.sleep(3)
         try:
-            temp,press1 = lib_BMP180.BMP180(1)
+            temp,press1 = lib_BMP1280.BMP()
         except:
             temp,press1 = None,None
     return press1,temp1,humi1
