@@ -35,3 +35,5 @@ git clone https://github.com/momorara/sensorPico<br>
 
 <h4><<メンテナンス情報>></h4>
 2023/08/11  初期設定でも最低限の動作をするように改造 v1.1 <br>
+2023/08/14  回路図を一部修正<br>
+            プログラム改修　　wifi未接続での動作改修、BMP280対応
