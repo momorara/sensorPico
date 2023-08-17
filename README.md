@@ -27,7 +27,7 @@ git clone https://github.com/momorara/sensorPico<br>
 インストールについては、インストール文書に従いインストールを行ってください。<br>
 
 <h4><<動作環境>></h4>
-2023/8/1 ファームウェア(micropython-firmware-pico-w-130623.uf2)　　で動作確認<br>
+2023/8/1 ファームウェア(micropython-firmware-pico-w-130623.uf2)　で動作確認<br>
    
 <h4><<使用説明資料>></h4>
 説明書類の中の資料を確認ください。
