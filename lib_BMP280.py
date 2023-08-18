@@ -360,8 +360,7 @@ def bmp280_dataRead():
         time.sleep(0.5)
         bmp = BMP280(i2c)
         temp = bmp.temperature
-        press = int(bmp.pressure/100*10)/10
-    
+        press = bmp.pressure/100
     return temp, press
 
 
