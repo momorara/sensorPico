@@ -34,6 +34,7 @@ def BMP():
                 temp,press1 = lib_BMP280.bmp280_dataRead()
             except:
                 temp,press1 = None,None
+        press1 = int(press1*10)/10
         return temp,press1
     
     print("デバイス取得エラー")
