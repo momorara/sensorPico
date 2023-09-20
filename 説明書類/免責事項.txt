@@ -1,5 +1,26 @@
 免責事項
-本サイトの内容については可能な限り慎重を期して記載をしておりますが、 誤りあるいは誤解を招く表現が含まれることがあり、 前提条件、利用する環境などの違いにより想定外の問題が発生する場合がございますので、 どのような条件であっても記載内容の保証は一切致しません。 また技術者相応の電気的知識を前提としており、然るべき手順、対策が取られない場合は、 感電、火災、爆発、怪我の可能性がありますので、充分にご注意してください。 本サイトの記載については、その内容や権利関係の正誤の如何を問わず、 ご利用ご参考された結果としていかなる損害、被害が生じたとしても当方では一切の責任を負いません。 ご利用される方ご自身の責任において充分にご吟味、ご判断の上ご利用いただきますようお願いいたします。 
+本サイトの内容については可能な限り慎重を期して記載をしておりますが、 
+誤りあるいは誤解を招く表現が含まれることがあり、 
+前提条件、利用する環境などの違いにより想定外の問題が発生する場合がございますので、
+ どのような条件であっても記載内容の保証は一切致しません。 
+また技術者相応の電気的知識を前提としており、然るべき手順、対策が取られない場合は、
+ 感電、火災、爆発、怪我の可能性がありますので、充分にご注意してください。
+ 本サイトの記載については、その内容や権利関係の正誤の如何を問わず、 
+ご利用ご参考された結果としていかなる損害、被害が生じたとしても当方では一切の責任を負いません。
+ ご利用される方ご自身の責任において充分にご吟味、ご判断の上ご利用いただきますようお願いいたします。 
 
 DISCLAIMER
-The articles of this site are described with the utmost care. However they may contain mistakes or misleading expressions and unexpected problems may occur due to differences in assumptions, environment and etc. Threfore I do NOT guarantee the contents under any conditions. In addition, the articles are supposed that the readers have electrical knowledge appropriate for engineers. Please note that there is a risk of electric shock, fire, explosion, or injury if appropriate procedures and measures are not taken. Regardless that the articles and references of the rights of interectual properties are correct or not, I do NOT take ANY RESPONSIBILITY for any damage or damage caused as a result. Please use it after careful examination and judgment at your own risk. I do not allow the use for commercial purposes without permission. 
+The articles of this site are described with the utmost care.
+ However they may contain mistakes or misleading expressions
+ and unexpected problems may occur due to differences in 
+assumptions, environment and etc. Threfore I do NOT guarantee
+ the contents under any conditions. In addition, the articles
+ are supposed that the readers have electrical knowledge 
+appropriate for engineers. Please note that there is a risk
+ of electric shock, fire, explosion, or injury if appropriate
+ procedures and measures are not taken. Regardless that the 
+articles and references of the rights of interectual properties
+ are correct or not, I do NOT take ANY RESPONSIBILITY for any
+ damage or damage caused as a result. Please use it after 
+careful examination and judgment at your own risk. 
+I do not allow the use for commercial purposes without permission. 
