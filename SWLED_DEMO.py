@@ -3,11 +3,13 @@
   基板上のタクトスイッチとLED の動作DEMO
    タクトスイッチを押すと点滅していたLED が 2秒間両方点灯する。
    v1.0
+2023/9/23   タクトスイッチをソフトプルアップとした
 """
 import machine
 import time
 
-SW   = machine.Pin( 15, machine.Pin.IN)
+# SW   = machine.Pin( 15, machine.Pin.IN)
+SW   = machine.Pin(15, machine.Pin.IN, machine.Pin.PULL_UP)
 led1 = machine.Pin(16, machine.Pin.OUT)
 led2 = machine.Pin(17, machine.Pin.OUT)
 
