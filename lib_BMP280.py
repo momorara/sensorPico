@@ -30,6 +30,12 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 """
+
+import config
+i2c_no,SDA_pin = config.i2c_ini()
+# センサー補正値
+T_hosei,H_hosei,P_hosei = config.hosei()
+
 # Power Modes
 BMP280_POWER_SLEEP = const(0)
 BMP280_POWER_FORCED = const(1)
@@ -361,7 +367,7 @@ def bmp280_dataRead():
         bmp = BMP280(i2c)
         temp = bmp.temperature
         press = bmp.pressure/100
-    return temp, press
+    return temp, press + P_hosei
 
 
 def main():
