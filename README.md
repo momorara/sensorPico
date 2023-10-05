@@ -12,7 +12,7 @@ sensorbard for pico
 　センサーにAHT10、BMP180(or BMP280)を使用して気温、湿度、気圧を測定します。<br>
 　さらにCdsセンサーも搭載して、明暗度も測定できます。<br>
 　それらのデータはwifiを使いambientという計測値表示サービスに投げていますので、表示データ保存が可能となっています。<br>
-   httpsambidata.iobdboard.htmlid=59777<br>
+   https://ambidata.iobdboard.htmlid=59777<br>
 　合わせてSWとLEDを２個装着していますので、アイディア次第で色々と使えると思います。<br>
 　小型のOLEDディスプレイを装着すれば、ローカルで気温、湿度、気圧を確認することも可能です。<br>
 　すべてのソースプログラムを開示いたします。<br>
