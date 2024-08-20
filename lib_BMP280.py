@@ -361,9 +361,10 @@ def bmp280_dataRead():
     temp = bmp.temperature
     press = bmp.pressure/100
 
-    # 900以下の数字が出たら再度計測
-    if press < 900:
-        time.sleep(0.5)
+    # 990以下の数字が出たら再度計測
+    # 電源投入時1回だけ低い値の出る個体があるため
+    if press < 990:
+        time.sleep(0.4)
         bmp = BMP280(i2c)
         temp = bmp.temperature
         press = bmp.pressure/100
