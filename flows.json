@@ -1,0 +1,3052 @@
+[
+    {
+        "id": "25ebc86c9dfeabe1",
+        "type": "tab",
+        "label": "フロー 1",
+        "disabled": false,
+        "info": "",
+        "env": []
+    },
+    {
+        "id": "09434c2ba9e6986e",
+        "type": "ui_base",
+        "theme": {
+            "name": "theme-light",
+            "lightTheme": {
+                "default": "#0094CE",
+                "baseColor": "#0094CE",
+                "baseFont": "-apple-system,BlinkMacSystemFont,Segoe UI,Roboto,Oxygen-Sans,Ubuntu,Cantarell,Helvetica Neue,sans-serif",
+                "edited": true,
+                "reset": false
+            },
+            "darkTheme": {
+                "default": "#097479",
+                "baseColor": "#097479",
+                "baseFont": "-apple-system,BlinkMacSystemFont,Segoe UI,Roboto,Oxygen-Sans,Ubuntu,Cantarell,Helvetica Neue,sans-serif",
+                "edited": false
+            },
+            "customTheme": {
+                "name": "Untitled Theme 1",
+                "default": "#4B7930",
+                "baseColor": "#4B7930",
+                "baseFont": "-apple-system,BlinkMacSystemFont,Segoe UI,Roboto,Oxygen-Sans,Ubuntu,Cantarell,Helvetica Neue,sans-serif"
+            },
+            "themeState": {
+                "base-color": {
+                    "default": "#0094CE",
+                    "value": "#0094CE",
+                    "edited": false
+                },
+                "page-titlebar-backgroundColor": {
+                    "value": "#0094CE",
+                    "edited": false
+                },
+                "page-backgroundColor": {
+                    "value": "#fafafa",
+                    "edited": false
+                },
+                "page-sidebar-backgroundColor": {
+                    "value": "#ffffff",
+                    "edited": false
+                },
+                "group-textColor": {
+                    "value": "#1bbfff",
+                    "edited": false
+                },
+                "group-borderColor": {
+                    "value": "#ffffff",
+                    "edited": false
+                },
+                "group-backgroundColor": {
+                    "value": "#ffffff",
+                    "edited": false
+                },
+                "widget-textColor": {
+                    "value": "#111111",
+                    "edited": false
+                },
+                "widget-backgroundColor": {
+                    "value": "#0094ce",
+                    "edited": false
+                },
+                "widget-borderColor": {
+                    "value": "#ffffff",
+                    "edited": false
+                },
+                "base-font": {
+                    "value": "-apple-system,BlinkMacSystemFont,Segoe UI,Roboto,Oxygen-Sans,Ubuntu,Cantarell,Helvetica Neue,sans-serif"
+                }
+            },
+            "angularTheme": {
+                "primary": "indigo",
+                "accents": "blue",
+                "warn": "red",
+                "background": "grey",
+                "palette": "light"
+            }
+        },
+        "site": {
+            "name": "Node-RED ダッシュボード",
+            "hideToolbar": "false",
+            "allowSwipe": "false",
+            "lockMenu": "false",
+            "allowTempTheme": "true",
+            "dateFormat": "YYYY/MM/DD",
+            "sizes": {
+                "sx": 48,
+                "sy": 48,
+                "gx": 6,
+                "gy": 6,
+                "cx": 6,
+                "cy": 6,
+                "px": 0,
+                "py": 0
+            }
+        }
+    },
+    {
+        "id": "bc0b1e53b5b8c5cd",
+        "type": "ui_tab",
+        "name": "温度表示",
+        "icon": "dashboard",
+        "order": 1,
+        "disabled": false,
+        "hidden": false
+    },
+    {
+        "id": "6981884ae00c53e8",
+        "type": "ui_group",
+        "name": "pico_AHT",
+        "tab": "bc0b1e53b5b8c5cd",
+        "order": 1,
+        "disp": true,
+        "width": "30",
+        "collapse": false,
+        "className": ""
+    },
+    {
+        "id": "5e101f2a90da875b",
+        "type": "mqtt-broker",
+        "name": "Free Public MQTT 5 Broker Server",
+        "broker": "broker.emqx.io",
+        "port": "1883",
+        "clientid": "",
+        "autoConnect": true,
+        "usetls": false,
+        "protocolVersion": "4",
+        "keepalive": "60",
+        "cleansession": true,
+        "autoUnsubscribe": true,
+        "birthTopic": "",
+        "birthQos": "0",
+        "birthRetain": "false",
+        "birthPayload": "",
+        "birthMsg": {},
+        "closeTopic": "",
+        "closeQos": "0",
+        "closeRetain": "false",
+        "closePayload": "",
+        "closeMsg": {},
+        "willTopic": "",
+        "willQos": "0",
+        "willRetain": "false",
+        "willPayload": "",
+        "willMsg": {},
+        "userProps": "",
+        "sessionExpiry": ""
+    },
+    {
+        "id": "a37a7c655a6262c0",
+        "type": "ui_spacer",
+        "z": "25ebc86c9dfeabe1",
+        "name": "spacer",
+        "group": "6981884ae00c53e8",
+        "order": 54,
+        "width": 21,
+        "height": 1
+    },
+    {
+        "id": "11a00c3b2d3f2821",
+        "type": "ui_gauge",
+        "z": "25ebc86c9dfeabe1",
+        "name": "",
+        "group": "6981884ae00c53e8",
+        "order": 1,
+        "width": 3,
+        "height": 3,
+        "gtype": "gage",
+        "title": "temp01",
+        "label": "units",
+        "format": "{{value}}",
+        "min": "-10",
+        "max": "50",
+        "colors": [
+            "#0501f4",
+            "#1aea90",
+            "#ca3838"
+        ],
+        "seg1": "20",
+        "seg2": "29",
+        "diff": false,
+        "className": "",
+        "x": 560,
+        "y": 260,
+        "wires": []
+    },
+    {
+        "id": "9cf82ff8921b82cf",
+        "type": "inject",
+        "z": "25ebc86c9dfeabe1",
+        "name": "",
+        "props": [
+            {
+                "p": "payload"
+            },
+            {
+                "p": "topic",
+                "vt": "str"
+            }
+        ],
+        "repeat": "",
+        "crontab": "",
+        "once": false,
+        "onceDelay": 0.1,
+        "topic": "",
+        "payload": "10",
+        "payloadType": "num",
+        "x": 570,
+        "y": 140,
+        "wires": [
+            [
+                "2031fb7dedc321c8"
+            ]
+        ]
+    },
+    {
+        "id": "8d09fe7e3b6a6dc7",
+        "type": "inject",
+        "z": "25ebc86c9dfeabe1",
+        "name": "",
+        "props": [
+            {
+                "p": "payload"
+            },
+            {
+                "p": "topic",
+                "vt": "str"
+            }
+        ],
+        "repeat": "",
+        "crontab": "",
+        "once": false,
+        "onceDelay": 0.1,
+        "topic": "",
+        "payload": "7",
+        "payloadType": "num",
+        "x": 170,
+        "y": 220,
+        "wires": [
+            [
+                "615beec8d2edf258"
+            ]
+        ]
+    },
+    {
+        "id": "6d1d359518dfbaf2",
+        "type": "ui_gauge",
+        "z": "25ebc86c9dfeabe1",
+        "name": "",
+        "group": "6981884ae00c53e8",
+        "order": 3,
+        "width": 3,
+        "height": 3,
+        "gtype": "gage",
+        "title": "temp03",
+        "label": "units",
+        "format": "{{value}}",
+        "min": "-10",
+        "max": "50",
+        "colors": [
+            "#0501f4",
+            "#1aea90",
+            "#ca3838"
+        ],
+        "seg1": "20",
+        "seg2": "29",
+        "diff": false,
+        "className": "",
+        "x": 560,
+        "y": 340,
+        "wires": []
+    },
+    {
+        "id": "4fbc9d6f130ac8bf",
+        "type": "ui_gauge",
+        "z": "25ebc86c9dfeabe1",
+        "name": "",
+        "group": "6981884ae00c53e8",
+        "order": 2,
+        "width": 3,
+        "height": 3,
+        "gtype": "gage",
+        "title": "temp02",
+        "label": "units",
+        "format": "{{value}}",
+        "min": "-10",
+        "max": "50",
+        "colors": [
+            "#0501f4",
+            "#1aea90",
+            "#ca3838"
+        ],
+        "seg1": "20",
+        "seg2": "29",
+        "diff": false,
+        "className": "",
+        "x": 560,
+        "y": 300,
+        "wires": []
+    },
+    {
+        "id": "437a7fdde1481765",
+        "type": "ui_gauge",
+        "z": "25ebc86c9dfeabe1",
+        "name": "",
+        "group": "6981884ae00c53e8",
+        "order": 4,
+        "width": 3,
+        "height": 3,
+        "gtype": "gage",
+        "title": "temp04",
+        "label": "units",
+        "format": "{{value}}",
+        "min": "-10",
+        "max": "50",
+        "colors": [
+            "#0501f4",
+            "#1aea90",
+            "#ca3838"
+        ],
+        "seg1": "20",
+        "seg2": "29",
+        "diff": false,
+        "className": "",
+        "x": 560,
+        "y": 380,
+        "wires": []
+    },
+    {
+        "id": "5afdb91a2ac265ee",
+        "type": "ui_gauge",
+        "z": "25ebc86c9dfeabe1",
+        "name": "",
+        "group": "6981884ae00c53e8",
+        "order": 5,
+        "width": 3,
+        "height": 3,
+        "gtype": "gage",
+        "title": "temp05",
+        "label": "units",
+        "format": "{{value}}",
+        "min": "-10",
+        "max": "50",
+        "colors": [
+            "#0501f4",
+            "#1aea90",
+            "#ca3838"
+        ],
+        "seg1": "20",
+        "seg2": "29",
+        "diff": false,
+        "className": "",
+        "x": 560,
+        "y": 420,
+        "wires": []
+    },
+    {
+        "id": "1772a51a54ef3a54",
+        "type": "ui_gauge",
+        "z": "25ebc86c9dfeabe1",
+        "name": "",
+        "group": "6981884ae00c53e8",
+        "order": 6,
+        "width": 3,
+        "height": 3,
+        "gtype": "gage",
+        "title": "temp06",
+        "label": "units",
+        "format": "{{value}}",
+        "min": "-10",
+        "max": "50",
+        "colors": [
+            "#0501f4",
+            "#1aea90",
+            "#ca3838"
+        ],
+        "seg1": "20",
+        "seg2": "29",
+        "diff": false,
+        "className": "",
+        "x": 560,
+        "y": 460,
+        "wires": []
+    },
+    {
+        "id": "961aa10aa85e347d",
+        "type": "ui_gauge",
+        "z": "25ebc86c9dfeabe1",
+        "name": "",
+        "group": "6981884ae00c53e8",
+        "order": 7,
+        "width": 3,
+        "height": 3,
+        "gtype": "gage",
+        "title": "temp07",
+        "label": "units",
+        "format": "{{value}}",
+        "min": "-10",
+        "max": "50",
+        "colors": [
+            "#0501f4",
+            "#1aea90",
+            "#ca3838"
+        ],
+        "seg1": "20",
+        "seg2": "29",
+        "diff": false,
+        "className": "",
+        "x": 560,
+        "y": 500,
+        "wires": []
+    },
+    {
+        "id": "5b4cc169e102bb00",
+        "type": "ui_gauge",
+        "z": "25ebc86c9dfeabe1",
+        "name": "",
+        "group": "6981884ae00c53e8",
+        "order": 8,
+        "width": 3,
+        "height": 3,
+        "gtype": "gage",
+        "title": "temp08",
+        "label": "units",
+        "format": "{{value}}",
+        "min": "-10",
+        "max": "50",
+        "colors": [
+            "#0501f4",
+            "#1aea90",
+            "#ca3838"
+        ],
+        "seg1": "20",
+        "seg2": "29",
+        "diff": false,
+        "className": "",
+        "x": 560,
+        "y": 540,
+        "wires": []
+    },
+    {
+        "id": "e360471bf32e8eaf",
+        "type": "ui_gauge",
+        "z": "25ebc86c9dfeabe1",
+        "name": "",
+        "group": "6981884ae00c53e8",
+        "order": 9,
+        "width": 3,
+        "height": 3,
+        "gtype": "gage",
+        "title": "temp09",
+        "label": "units",
+        "format": "{{value}}",
+        "min": "-10",
+        "max": "50",
+        "colors": [
+            "#0501f4",
+            "#1aea90",
+            "#ca3838"
+        ],
+        "seg1": "20",
+        "seg2": "29",
+        "diff": false,
+        "className": "",
+        "x": 560,
+        "y": 580,
+        "wires": []
+    },
+    {
+        "id": "6ad8e8d441aa6333",
+        "type": "ui_gauge",
+        "z": "25ebc86c9dfeabe1",
+        "name": "",
+        "group": "6981884ae00c53e8",
+        "order": 10,
+        "width": 3,
+        "height": 3,
+        "gtype": "gage",
+        "title": "temp10",
+        "label": "units",
+        "format": "{{value}}",
+        "min": "-10",
+        "max": "50",
+        "colors": [
+            "#0501f4",
+            "#1aea90",
+            "#ca3838"
+        ],
+        "seg1": "20",
+        "seg2": "29",
+        "diff": false,
+        "className": "",
+        "x": 560,
+        "y": 620,
+        "wires": []
+    },
+    {
+        "id": "009daeee52ebe338",
+        "type": "mqtt in",
+        "z": "25ebc86c9dfeabe1",
+        "name": "",
+        "topic": "tkj/raspberry_pico/temp_AHT/1",
+        "qos": "0",
+        "datatype": "auto-detect",
+        "broker": "5e101f2a90da875b",
+        "nl": false,
+        "rap": true,
+        "rh": 0,
+        "inputs": 0,
+        "x": 210,
+        "y": 260,
+        "wires": [
+            [
+                "a0699dc091ac4ed2",
+                "11a00c3b2d3f2821"
+            ]
+        ]
+    },
+    {
+        "id": "2031fb7dedc321c8",
+        "type": "mqtt out",
+        "z": "25ebc86c9dfeabe1",
+        "name": "",
+        "topic": "tkj/raspberry_pico/temp_AHT/1",
+        "qos": "0",
+        "retain": "true",
+        "respTopic": "",
+        "contentType": "",
+        "userProps": "",
+        "correl": "",
+        "expiry": "",
+        "broker": "5e101f2a90da875b",
+        "x": 790,
+        "y": 140,
+        "wires": []
+    },
+    {
+        "id": "224d41de2d537486",
+        "type": "inject",
+        "z": "25ebc86c9dfeabe1",
+        "name": "",
+        "props": [
+            {
+                "p": "payload"
+            },
+            {
+                "p": "topic",
+                "vt": "str"
+            }
+        ],
+        "repeat": "",
+        "crontab": "",
+        "once": false,
+        "onceDelay": 0.1,
+        "topic": "",
+        "payload": "30",
+        "payloadType": "num",
+        "x": 570,
+        "y": 80,
+        "wires": [
+            [
+                "2031fb7dedc321c8"
+            ]
+        ]
+    },
+    {
+        "id": "a0699dc091ac4ed2",
+        "type": "debug",
+        "z": "25ebc86c9dfeabe1",
+        "name": "debug 1",
+        "active": true,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "false",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 720,
+        "y": 200,
+        "wires": []
+    },
+    {
+        "id": "afe6b095c395f211",
+        "type": "mqtt in",
+        "z": "25ebc86c9dfeabe1",
+        "name": "",
+        "topic": "tkj/raspberry_pico/temp_AHT/2",
+        "qos": "0",
+        "datatype": "auto-detect",
+        "broker": "5e101f2a90da875b",
+        "nl": false,
+        "rap": true,
+        "rh": 0,
+        "inputs": 0,
+        "x": 210,
+        "y": 300,
+        "wires": [
+            [
+                "4fbc9d6f130ac8bf"
+            ]
+        ]
+    },
+    {
+        "id": "f80c0ebfab545a51",
+        "type": "mqtt in",
+        "z": "25ebc86c9dfeabe1",
+        "name": "",
+        "topic": "tkj/raspberry_pico/temp_AHT/3",
+        "qos": "0",
+        "datatype": "auto-detect",
+        "broker": "5e101f2a90da875b",
+        "nl": false,
+        "rap": true,
+        "rh": 0,
+        "inputs": 0,
+        "x": 210,
+        "y": 340,
+        "wires": [
+            [
+                "6d1d359518dfbaf2"
+            ]
+        ]
+    },
+    {
+        "id": "9e39ac55dfc3df41",
+        "type": "mqtt in",
+        "z": "25ebc86c9dfeabe1",
+        "name": "",
+        "topic": "tkj/raspberry_pico/temp_AHT/4",
+        "qos": "0",
+        "datatype": "auto-detect",
+        "broker": "5e101f2a90da875b",
+        "nl": false,
+        "rap": true,
+        "rh": 0,
+        "inputs": 0,
+        "x": 210,
+        "y": 380,
+        "wires": [
+            [
+                "437a7fdde1481765"
+            ]
+        ]
+    },
+    {
+        "id": "eb203c842f85c826",
+        "type": "mqtt in",
+        "z": "25ebc86c9dfeabe1",
+        "name": "",
+        "topic": "tkj/raspberry_pico/temp_AHT/5",
+        "qos": "0",
+        "datatype": "auto-detect",
+        "broker": "5e101f2a90da875b",
+        "nl": false,
+        "rap": true,
+        "rh": 0,
+        "inputs": 0,
+        "x": 210,
+        "y": 420,
+        "wires": [
+            [
+                "5afdb91a2ac265ee"
+            ]
+        ]
+    },
+    {
+        "id": "6f0109015271c122",
+        "type": "mqtt in",
+        "z": "25ebc86c9dfeabe1",
+        "name": "",
+        "topic": "tkj/raspberry_pico/temp_AHT/6",
+        "qos": "0",
+        "datatype": "auto-detect",
+        "broker": "5e101f2a90da875b",
+        "nl": false,
+        "rap": true,
+        "rh": 0,
+        "inputs": 0,
+        "x": 210,
+        "y": 460,
+        "wires": [
+            [
+                "1772a51a54ef3a54"
+            ]
+        ]
+    },
+    {
+        "id": "04747d03ae69541b",
+        "type": "mqtt in",
+        "z": "25ebc86c9dfeabe1",
+        "name": "",
+        "topic": "tkj/raspberry_pico/temp_AHT/7",
+        "qos": "0",
+        "datatype": "auto-detect",
+        "broker": "5e101f2a90da875b",
+        "nl": false,
+        "rap": true,
+        "rh": 0,
+        "inputs": 0,
+        "x": 210,
+        "y": 500,
+        "wires": [
+            [
+                "961aa10aa85e347d"
+            ]
+        ]
+    },
+    {
+        "id": "97913fec5a741903",
+        "type": "mqtt in",
+        "z": "25ebc86c9dfeabe1",
+        "name": "",
+        "topic": "tkj/raspberry_pico/temp_AHT/8",
+        "qos": "0",
+        "datatype": "auto-detect",
+        "broker": "5e101f2a90da875b",
+        "nl": false,
+        "rap": true,
+        "rh": 0,
+        "inputs": 0,
+        "x": 210,
+        "y": 540,
+        "wires": [
+            [
+                "5b4cc169e102bb00"
+            ]
+        ]
+    },
+    {
+        "id": "6ecb826f3fd7eb16",
+        "type": "mqtt in",
+        "z": "25ebc86c9dfeabe1",
+        "name": "",
+        "topic": "tkj/raspberry_pico/temp_AHT/9",
+        "qos": "0",
+        "datatype": "auto-detect",
+        "broker": "5e101f2a90da875b",
+        "nl": false,
+        "rap": true,
+        "rh": 0,
+        "inputs": 0,
+        "x": 210,
+        "y": 580,
+        "wires": [
+            [
+                "e360471bf32e8eaf"
+            ]
+        ]
+    },
+    {
+        "id": "8c63b65b8d3988e1",
+        "type": "mqtt in",
+        "z": "25ebc86c9dfeabe1",
+        "name": "",
+        "topic": "tkj/raspberry_pico/temp_AHT/10",
+        "qos": "0",
+        "datatype": "auto-detect",
+        "broker": "5e101f2a90da875b",
+        "nl": false,
+        "rap": true,
+        "rh": 0,
+        "inputs": 0,
+        "x": 210,
+        "y": 620,
+        "wires": [
+            [
+                "6ad8e8d441aa6333"
+            ]
+        ]
+    },
+    {
+        "id": "615beec8d2edf258",
+        "type": "link out",
+        "z": "25ebc86c9dfeabe1",
+        "name": "link out 1",
+        "mode": "link",
+        "links": [
+            "68c697326a90b5f4",
+            "308ae17ed18ff1fc",
+            "05e8d6e1a766149e",
+            "4ee6779fb64b99e9",
+            "c7f19632ec35d6df"
+        ],
+        "x": 315,
+        "y": 200,
+        "wires": []
+    },
+    {
+        "id": "68c697326a90b5f4",
+        "type": "link in",
+        "z": "25ebc86c9dfeabe1",
+        "name": "link in 1",
+        "links": [
+            "615beec8d2edf258"
+        ],
+        "x": 375,
+        "y": 200,
+        "wires": [
+            [
+                "11a00c3b2d3f2821",
+                "4fbc9d6f130ac8bf",
+                "6d1d359518dfbaf2",
+                "437a7fdde1481765",
+                "5afdb91a2ac265ee",
+                "1772a51a54ef3a54",
+                "961aa10aa85e347d",
+                "5b4cc169e102bb00",
+                "e360471bf32e8eaf",
+                "6ad8e8d441aa6333"
+            ]
+        ]
+    },
+    {
+        "id": "322c97d9dffcaaa4",
+        "type": "ui_gauge",
+        "z": "25ebc86c9dfeabe1",
+        "name": "",
+        "group": "6981884ae00c53e8",
+        "order": 11,
+        "width": 3,
+        "height": 3,
+        "gtype": "gage",
+        "title": "temp11",
+        "label": "units",
+        "format": "{{value}}",
+        "min": "-10",
+        "max": "50",
+        "colors": [
+            "#0501f4",
+            "#1aea90",
+            "#ca3838"
+        ],
+        "seg1": "20",
+        "seg2": "29",
+        "diff": false,
+        "className": "",
+        "x": 560,
+        "y": 700,
+        "wires": []
+    },
+    {
+        "id": "e49262dbd291e234",
+        "type": "ui_gauge",
+        "z": "25ebc86c9dfeabe1",
+        "name": "",
+        "group": "6981884ae00c53e8",
+        "order": 13,
+        "width": 3,
+        "height": 3,
+        "gtype": "gage",
+        "title": "temp13",
+        "label": "units",
+        "format": "{{value}}",
+        "min": "-10",
+        "max": "50",
+        "colors": [
+            "#0501f4",
+            "#1aea90",
+            "#ca3838"
+        ],
+        "seg1": "20",
+        "seg2": "29",
+        "diff": false,
+        "className": "",
+        "x": 560,
+        "y": 780,
+        "wires": []
+    },
+    {
+        "id": "80cf9c2b65312e45",
+        "type": "ui_gauge",
+        "z": "25ebc86c9dfeabe1",
+        "name": "",
+        "group": "6981884ae00c53e8",
+        "order": 12,
+        "width": 3,
+        "height": 3,
+        "gtype": "gage",
+        "title": "temp12",
+        "label": "units",
+        "format": "{{value}}",
+        "min": "-10",
+        "max": "50",
+        "colors": [
+            "#0501f4",
+            "#1aea90",
+            "#ca3838"
+        ],
+        "seg1": "20",
+        "seg2": "29",
+        "diff": false,
+        "className": "",
+        "x": 560,
+        "y": 740,
+        "wires": []
+    },
+    {
+        "id": "8e8ea010f0578e99",
+        "type": "ui_gauge",
+        "z": "25ebc86c9dfeabe1",
+        "name": "",
+        "group": "6981884ae00c53e8",
+        "order": 14,
+        "width": 3,
+        "height": 3,
+        "gtype": "gage",
+        "title": "temp14",
+        "label": "units",
+        "format": "{{value}}",
+        "min": "-10",
+        "max": "50",
+        "colors": [
+            "#0501f4",
+            "#1aea90",
+            "#ca3838"
+        ],
+        "seg1": "20",
+        "seg2": "29",
+        "diff": false,
+        "className": "",
+        "x": 560,
+        "y": 820,
+        "wires": []
+    },
+    {
+        "id": "c4d152ce907ea608",
+        "type": "ui_gauge",
+        "z": "25ebc86c9dfeabe1",
+        "name": "",
+        "group": "6981884ae00c53e8",
+        "order": 15,
+        "width": 3,
+        "height": 3,
+        "gtype": "gage",
+        "title": "temp15",
+        "label": "units",
+        "format": "{{value}}",
+        "min": "-10",
+        "max": "50",
+        "colors": [
+            "#0501f4",
+            "#1aea90",
+            "#ca3838"
+        ],
+        "seg1": "20",
+        "seg2": "29",
+        "diff": false,
+        "className": "",
+        "x": 560,
+        "y": 860,
+        "wires": []
+    },
+    {
+        "id": "da60a1b2538aaa96",
+        "type": "ui_gauge",
+        "z": "25ebc86c9dfeabe1",
+        "name": "",
+        "group": "6981884ae00c53e8",
+        "order": 16,
+        "width": 3,
+        "height": 3,
+        "gtype": "gage",
+        "title": "temp16",
+        "label": "units",
+        "format": "{{value}}",
+        "min": "-10",
+        "max": "50",
+        "colors": [
+            "#0501f4",
+            "#1aea90",
+            "#ca3838"
+        ],
+        "seg1": "20",
+        "seg2": "29",
+        "diff": false,
+        "className": "",
+        "x": 560,
+        "y": 900,
+        "wires": []
+    },
+    {
+        "id": "23309f3bc5ddb1ce",
+        "type": "ui_gauge",
+        "z": "25ebc86c9dfeabe1",
+        "name": "",
+        "group": "6981884ae00c53e8",
+        "order": 17,
+        "width": 3,
+        "height": 3,
+        "gtype": "gage",
+        "title": "temp17",
+        "label": "units",
+        "format": "{{value}}",
+        "min": "-10",
+        "max": "50",
+        "colors": [
+            "#0501f4",
+            "#1aea90",
+            "#ca3838"
+        ],
+        "seg1": "20",
+        "seg2": "29",
+        "diff": false,
+        "className": "",
+        "x": 560,
+        "y": 940,
+        "wires": []
+    },
+    {
+        "id": "63aa64b06767c2bf",
+        "type": "ui_gauge",
+        "z": "25ebc86c9dfeabe1",
+        "name": "",
+        "group": "6981884ae00c53e8",
+        "order": 18,
+        "width": 3,
+        "height": 3,
+        "gtype": "gage",
+        "title": "temp18",
+        "label": "units",
+        "format": "{{value}}",
+        "min": "-10",
+        "max": "50",
+        "colors": [
+            "#0501f4",
+            "#1aea90",
+            "#ca3838"
+        ],
+        "seg1": "20",
+        "seg2": "29",
+        "diff": false,
+        "className": "",
+        "x": 560,
+        "y": 980,
+        "wires": []
+    },
+    {
+        "id": "cacf379d38929198",
+        "type": "ui_gauge",
+        "z": "25ebc86c9dfeabe1",
+        "name": "",
+        "group": "6981884ae00c53e8",
+        "order": 19,
+        "width": 3,
+        "height": 3,
+        "gtype": "gage",
+        "title": "temp19",
+        "label": "units",
+        "format": "{{value}}",
+        "min": "-10",
+        "max": "50",
+        "colors": [
+            "#0501f4",
+            "#1aea90",
+            "#ca3838"
+        ],
+        "seg1": "20",
+        "seg2": "29",
+        "diff": false,
+        "className": "",
+        "x": 560,
+        "y": 1020,
+        "wires": []
+    },
+    {
+        "id": "a9c16d93986af83e",
+        "type": "ui_gauge",
+        "z": "25ebc86c9dfeabe1",
+        "name": "",
+        "group": "6981884ae00c53e8",
+        "order": 20,
+        "width": 3,
+        "height": 3,
+        "gtype": "gage",
+        "title": "temp20",
+        "label": "units",
+        "format": "{{value}}",
+        "min": "-10",
+        "max": "50",
+        "colors": [
+            "#0501f4",
+            "#1aea90",
+            "#ca3838"
+        ],
+        "seg1": "20",
+        "seg2": "29",
+        "diff": false,
+        "className": "",
+        "x": 560,
+        "y": 1060,
+        "wires": []
+    },
+    {
+        "id": "58828d4e7c7fbec4",
+        "type": "mqtt in",
+        "z": "25ebc86c9dfeabe1",
+        "name": "",
+        "topic": "tkj/raspberry_pico/temp_AHT/11",
+        "qos": "0",
+        "datatype": "auto-detect",
+        "broker": "5e101f2a90da875b",
+        "nl": false,
+        "rap": true,
+        "rh": 0,
+        "inputs": 0,
+        "x": 210,
+        "y": 700,
+        "wires": [
+            [
+                "322c97d9dffcaaa4"
+            ]
+        ]
+    },
+    {
+        "id": "0fb102d0e97cc601",
+        "type": "mqtt in",
+        "z": "25ebc86c9dfeabe1",
+        "name": "",
+        "topic": "tkj/raspberry_pico/temp_AHT/12",
+        "qos": "0",
+        "datatype": "auto-detect",
+        "broker": "5e101f2a90da875b",
+        "nl": false,
+        "rap": true,
+        "rh": 0,
+        "inputs": 0,
+        "x": 210,
+        "y": 740,
+        "wires": [
+            [
+                "80cf9c2b65312e45"
+            ]
+        ]
+    },
+    {
+        "id": "649af84c742733fe",
+        "type": "mqtt in",
+        "z": "25ebc86c9dfeabe1",
+        "name": "",
+        "topic": "tkj/raspberry_pico/temp_AHT/13",
+        "qos": "0",
+        "datatype": "auto-detect",
+        "broker": "5e101f2a90da875b",
+        "nl": false,
+        "rap": true,
+        "rh": 0,
+        "inputs": 0,
+        "x": 210,
+        "y": 780,
+        "wires": [
+            [
+                "e49262dbd291e234"
+            ]
+        ]
+    },
+    {
+        "id": "921e8907726d9149",
+        "type": "mqtt in",
+        "z": "25ebc86c9dfeabe1",
+        "name": "",
+        "topic": "tkj/raspberry_pico/temp_AHT/14",
+        "qos": "0",
+        "datatype": "auto-detect",
+        "broker": "5e101f2a90da875b",
+        "nl": false,
+        "rap": true,
+        "rh": 0,
+        "inputs": 0,
+        "x": 210,
+        "y": 820,
+        "wires": [
+            [
+                "8e8ea010f0578e99"
+            ]
+        ]
+    },
+    {
+        "id": "084997eaaae604de",
+        "type": "mqtt in",
+        "z": "25ebc86c9dfeabe1",
+        "name": "",
+        "topic": "tkj/raspberry_pico/temp_AHT/15",
+        "qos": "0",
+        "datatype": "auto-detect",
+        "broker": "5e101f2a90da875b",
+        "nl": false,
+        "rap": true,
+        "rh": 0,
+        "inputs": 0,
+        "x": 210,
+        "y": 860,
+        "wires": [
+            [
+                "c4d152ce907ea608"
+            ]
+        ]
+    },
+    {
+        "id": "934a937703062527",
+        "type": "mqtt in",
+        "z": "25ebc86c9dfeabe1",
+        "name": "",
+        "topic": "tkj/raspberry_pico/temp_AHT/16",
+        "qos": "0",
+        "datatype": "auto-detect",
+        "broker": "5e101f2a90da875b",
+        "nl": false,
+        "rap": true,
+        "rh": 0,
+        "inputs": 0,
+        "x": 210,
+        "y": 900,
+        "wires": [
+            [
+                "da60a1b2538aaa96"
+            ]
+        ]
+    },
+    {
+        "id": "4cd9338793e89d95",
+        "type": "mqtt in",
+        "z": "25ebc86c9dfeabe1",
+        "name": "",
+        "topic": "tkj/raspberry_pico/temp_AHT/17",
+        "qos": "0",
+        "datatype": "auto-detect",
+        "broker": "5e101f2a90da875b",
+        "nl": false,
+        "rap": true,
+        "rh": 0,
+        "inputs": 0,
+        "x": 210,
+        "y": 940,
+        "wires": [
+            [
+                "23309f3bc5ddb1ce"
+            ]
+        ]
+    },
+    {
+        "id": "c23442ccd9bc2892",
+        "type": "mqtt in",
+        "z": "25ebc86c9dfeabe1",
+        "name": "",
+        "topic": "tkj/raspberry_pico/temp_AHT/18",
+        "qos": "0",
+        "datatype": "auto-detect",
+        "broker": "5e101f2a90da875b",
+        "nl": false,
+        "rap": true,
+        "rh": 0,
+        "inputs": 0,
+        "x": 210,
+        "y": 980,
+        "wires": [
+            [
+                "63aa64b06767c2bf"
+            ]
+        ]
+    },
+    {
+        "id": "8f769f1534314892",
+        "type": "mqtt in",
+        "z": "25ebc86c9dfeabe1",
+        "name": "",
+        "topic": "tkj/raspberry_pico/temp_AHT/19",
+        "qos": "0",
+        "datatype": "auto-detect",
+        "broker": "5e101f2a90da875b",
+        "nl": false,
+        "rap": true,
+        "rh": 0,
+        "inputs": 0,
+        "x": 210,
+        "y": 1020,
+        "wires": [
+            [
+                "cacf379d38929198"
+            ]
+        ]
+    },
+    {
+        "id": "4a331d25894013ec",
+        "type": "mqtt in",
+        "z": "25ebc86c9dfeabe1",
+        "name": "",
+        "topic": "tkj/raspberry_pico/temp_AHT/20",
+        "qos": "0",
+        "datatype": "auto-detect",
+        "broker": "5e101f2a90da875b",
+        "nl": false,
+        "rap": true,
+        "rh": 0,
+        "inputs": 0,
+        "x": 210,
+        "y": 1060,
+        "wires": [
+            [
+                "a9c16d93986af83e"
+            ]
+        ]
+    },
+    {
+        "id": "238431c4f8028fa6",
+        "type": "ui_gauge",
+        "z": "25ebc86c9dfeabe1",
+        "name": "",
+        "group": "6981884ae00c53e8",
+        "order": 21,
+        "width": 3,
+        "height": 3,
+        "gtype": "gage",
+        "title": "temp21",
+        "label": "units",
+        "format": "{{value}}",
+        "min": "-10",
+        "max": "50",
+        "colors": [
+            "#0501f4",
+            "#1aea90",
+            "#ca3838"
+        ],
+        "seg1": "20",
+        "seg2": "29",
+        "diff": false,
+        "className": "",
+        "x": 560,
+        "y": 1140,
+        "wires": []
+    },
+    {
+        "id": "f4f000fb04d3e9ad",
+        "type": "mqtt in",
+        "z": "25ebc86c9dfeabe1",
+        "name": "",
+        "topic": "tkj/raspberry_pico/temp_AHT/21",
+        "qos": "0",
+        "datatype": "auto-detect",
+        "broker": "5e101f2a90da875b",
+        "nl": false,
+        "rap": true,
+        "rh": 0,
+        "inputs": 0,
+        "x": 210,
+        "y": 1140,
+        "wires": [
+            [
+                "238431c4f8028fa6"
+            ]
+        ]
+    },
+    {
+        "id": "c2d02e9712342663",
+        "type": "mqtt in",
+        "z": "25ebc86c9dfeabe1",
+        "name": "",
+        "topic": "tkj/raspberry_pico/temp_AHT/22",
+        "qos": "0",
+        "datatype": "auto-detect",
+        "broker": "5e101f2a90da875b",
+        "nl": false,
+        "rap": true,
+        "rh": 0,
+        "inputs": 0,
+        "x": 210,
+        "y": 1180,
+        "wires": [
+            [
+                "25d6a5b447486626"
+            ]
+        ]
+    },
+    {
+        "id": "25d6a5b447486626",
+        "type": "ui_gauge",
+        "z": "25ebc86c9dfeabe1",
+        "name": "",
+        "group": "6981884ae00c53e8",
+        "order": 22,
+        "width": 3,
+        "height": 3,
+        "gtype": "gage",
+        "title": "temp22",
+        "label": "units",
+        "format": "{{value}}",
+        "min": "-10",
+        "max": "50",
+        "colors": [
+            "#0501f4",
+            "#1aea90",
+            "#ca3838"
+        ],
+        "seg1": "20",
+        "seg2": "29",
+        "diff": false,
+        "className": "",
+        "x": 560,
+        "y": 1180,
+        "wires": []
+    },
+    {
+        "id": "5620e7f02c0ad07e",
+        "type": "ui_gauge",
+        "z": "25ebc86c9dfeabe1",
+        "name": "",
+        "group": "6981884ae00c53e8",
+        "order": 23,
+        "width": 3,
+        "height": 3,
+        "gtype": "gage",
+        "title": "temp23",
+        "label": "units",
+        "format": "{{value}}",
+        "min": "-10",
+        "max": "50",
+        "colors": [
+            "#0501f4",
+            "#1aea90",
+            "#ca3838"
+        ],
+        "seg1": "20",
+        "seg2": "29",
+        "diff": false,
+        "className": "",
+        "x": 560,
+        "y": 1220,
+        "wires": []
+    },
+    {
+        "id": "f00c401944e8bb96",
+        "type": "mqtt in",
+        "z": "25ebc86c9dfeabe1",
+        "name": "",
+        "topic": "tkj/raspberry_pico/temp_AHT/23",
+        "qos": "0",
+        "datatype": "auto-detect",
+        "broker": "5e101f2a90da875b",
+        "nl": false,
+        "rap": true,
+        "rh": 0,
+        "inputs": 0,
+        "x": 210,
+        "y": 1220,
+        "wires": [
+            [
+                "5620e7f02c0ad07e"
+            ]
+        ]
+    },
+    {
+        "id": "0c871f1e6240a2ed",
+        "type": "mqtt in",
+        "z": "25ebc86c9dfeabe1",
+        "name": "",
+        "topic": "tkj/raspberry_pico/temp_AHT/24",
+        "qos": "0",
+        "datatype": "auto-detect",
+        "broker": "5e101f2a90da875b",
+        "nl": false,
+        "rap": true,
+        "rh": 0,
+        "inputs": 0,
+        "x": 210,
+        "y": 1260,
+        "wires": [
+            [
+                "5481e30b593d5320"
+            ]
+        ]
+    },
+    {
+        "id": "5481e30b593d5320",
+        "type": "ui_gauge",
+        "z": "25ebc86c9dfeabe1",
+        "name": "",
+        "group": "6981884ae00c53e8",
+        "order": 24,
+        "width": 3,
+        "height": 3,
+        "gtype": "gage",
+        "title": "temp24",
+        "label": "units",
+        "format": "{{value}}",
+        "min": "-10",
+        "max": "50",
+        "colors": [
+            "#0501f4",
+            "#1aea90",
+            "#ca3838"
+        ],
+        "seg1": "20",
+        "seg2": "29",
+        "diff": false,
+        "className": "",
+        "x": 560,
+        "y": 1260,
+        "wires": []
+    },
+    {
+        "id": "90b89f65094811c8",
+        "type": "mqtt in",
+        "z": "25ebc86c9dfeabe1",
+        "name": "",
+        "topic": "tkj/raspberry_pico/temp_AHT/25",
+        "qos": "0",
+        "datatype": "auto-detect",
+        "broker": "5e101f2a90da875b",
+        "nl": false,
+        "rap": true,
+        "rh": 0,
+        "inputs": 0,
+        "x": 210,
+        "y": 1300,
+        "wires": [
+            [
+                "c699a2988bb6baf8"
+            ]
+        ]
+    },
+    {
+        "id": "c699a2988bb6baf8",
+        "type": "ui_gauge",
+        "z": "25ebc86c9dfeabe1",
+        "name": "",
+        "group": "6981884ae00c53e8",
+        "order": 25,
+        "width": 3,
+        "height": 3,
+        "gtype": "gage",
+        "title": "temp25",
+        "label": "units",
+        "format": "{{value}}",
+        "min": "-10",
+        "max": "50",
+        "colors": [
+            "#0501f4",
+            "#1aea90",
+            "#ca3838"
+        ],
+        "seg1": "20",
+        "seg2": "29",
+        "diff": false,
+        "className": "",
+        "x": 560,
+        "y": 1300,
+        "wires": []
+    },
+    {
+        "id": "e8d44f4ef296f415",
+        "type": "mqtt in",
+        "z": "25ebc86c9dfeabe1",
+        "name": "",
+        "topic": "tkj/raspberry_pico/temp_AHT/26",
+        "qos": "0",
+        "datatype": "auto-detect",
+        "broker": "5e101f2a90da875b",
+        "nl": false,
+        "rap": true,
+        "rh": 0,
+        "inputs": 0,
+        "x": 210,
+        "y": 1340,
+        "wires": [
+            [
+                "11a551eb7fc4f4dc"
+            ]
+        ]
+    },
+    {
+        "id": "11a551eb7fc4f4dc",
+        "type": "ui_gauge",
+        "z": "25ebc86c9dfeabe1",
+        "name": "",
+        "group": "6981884ae00c53e8",
+        "order": 26,
+        "width": 3,
+        "height": 3,
+        "gtype": "gage",
+        "title": "temp26",
+        "label": "units",
+        "format": "{{value}}",
+        "min": "-10",
+        "max": "50",
+        "colors": [
+            "#0501f4",
+            "#1aea90",
+            "#ca3838"
+        ],
+        "seg1": "20",
+        "seg2": "29",
+        "diff": false,
+        "className": "",
+        "x": 560,
+        "y": 1340,
+        "wires": []
+    },
+    {
+        "id": "c477bb87ee4365d0",
+        "type": "mqtt in",
+        "z": "25ebc86c9dfeabe1",
+        "name": "",
+        "topic": "tkj/raspberry_pico/temp_AHT/27",
+        "qos": "0",
+        "datatype": "auto-detect",
+        "broker": "5e101f2a90da875b",
+        "nl": false,
+        "rap": true,
+        "rh": 0,
+        "inputs": 0,
+        "x": 210,
+        "y": 1380,
+        "wires": [
+            [
+                "da127ac9f27e3e2d"
+            ]
+        ]
+    },
+    {
+        "id": "da127ac9f27e3e2d",
+        "type": "ui_gauge",
+        "z": "25ebc86c9dfeabe1",
+        "name": "",
+        "group": "6981884ae00c53e8",
+        "order": 27,
+        "width": 3,
+        "height": 3,
+        "gtype": "gage",
+        "title": "temp27",
+        "label": "units",
+        "format": "{{value}}",
+        "min": "-10",
+        "max": "50",
+        "colors": [
+            "#0501f4",
+            "#1aea90",
+            "#ca3838"
+        ],
+        "seg1": "20",
+        "seg2": "29",
+        "diff": false,
+        "className": "",
+        "x": 560,
+        "y": 1380,
+        "wires": []
+    },
+    {
+        "id": "ce14b6ab898cd02b",
+        "type": "mqtt in",
+        "z": "25ebc86c9dfeabe1",
+        "name": "",
+        "topic": "tkj/raspberry_pico/temp_AHT/28",
+        "qos": "0",
+        "datatype": "auto-detect",
+        "broker": "5e101f2a90da875b",
+        "nl": false,
+        "rap": true,
+        "rh": 0,
+        "inputs": 0,
+        "x": 210,
+        "y": 1420,
+        "wires": [
+            [
+                "6c5c085272f03891"
+            ]
+        ]
+    },
+    {
+        "id": "6c5c085272f03891",
+        "type": "ui_gauge",
+        "z": "25ebc86c9dfeabe1",
+        "name": "",
+        "group": "6981884ae00c53e8",
+        "order": 28,
+        "width": 3,
+        "height": 3,
+        "gtype": "gage",
+        "title": "temp28",
+        "label": "units",
+        "format": "{{value}}",
+        "min": "-10",
+        "max": "50",
+        "colors": [
+            "#0501f4",
+            "#1aea90",
+            "#ca3838"
+        ],
+        "seg1": "20",
+        "seg2": "29",
+        "diff": false,
+        "className": "",
+        "x": 560,
+        "y": 1420,
+        "wires": []
+    },
+    {
+        "id": "311f631891d6fbe5",
+        "type": "mqtt in",
+        "z": "25ebc86c9dfeabe1",
+        "name": "",
+        "topic": "tkj/raspberry_pico/temp_AHT/29",
+        "qos": "0",
+        "datatype": "auto-detect",
+        "broker": "5e101f2a90da875b",
+        "nl": false,
+        "rap": true,
+        "rh": 0,
+        "inputs": 0,
+        "x": 210,
+        "y": 1460,
+        "wires": [
+            [
+                "493c207969dd7e2b"
+            ]
+        ]
+    },
+    {
+        "id": "493c207969dd7e2b",
+        "type": "ui_gauge",
+        "z": "25ebc86c9dfeabe1",
+        "name": "",
+        "group": "6981884ae00c53e8",
+        "order": 29,
+        "width": 3,
+        "height": 3,
+        "gtype": "gage",
+        "title": "temp29",
+        "label": "units",
+        "format": "{{value}}",
+        "min": "-10",
+        "max": "50",
+        "colors": [
+            "#0501f4",
+            "#1aea90",
+            "#ca3838"
+        ],
+        "seg1": "20",
+        "seg2": "29",
+        "diff": false,
+        "className": "",
+        "x": 560,
+        "y": 1460,
+        "wires": []
+    },
+    {
+        "id": "50541d0882c8851f",
+        "type": "mqtt in",
+        "z": "25ebc86c9dfeabe1",
+        "name": "",
+        "topic": "tkj/raspberry_pico/temp_AHT/30",
+        "qos": "0",
+        "datatype": "auto-detect",
+        "broker": "5e101f2a90da875b",
+        "nl": false,
+        "rap": true,
+        "rh": 0,
+        "inputs": 0,
+        "x": 210,
+        "y": 1500,
+        "wires": [
+            [
+                "2b5cd737608ceaab"
+            ]
+        ]
+    },
+    {
+        "id": "2b5cd737608ceaab",
+        "type": "ui_gauge",
+        "z": "25ebc86c9dfeabe1",
+        "name": "",
+        "group": "6981884ae00c53e8",
+        "order": 30,
+        "width": 3,
+        "height": 3,
+        "gtype": "gage",
+        "title": "temp30",
+        "label": "units",
+        "format": "{{value}}",
+        "min": "-10",
+        "max": "50",
+        "colors": [
+            "#0501f4",
+            "#1aea90",
+            "#ca3838"
+        ],
+        "seg1": "20",
+        "seg2": "29",
+        "diff": false,
+        "className": "",
+        "x": 560,
+        "y": 1500,
+        "wires": []
+    },
+    {
+        "id": "308ae17ed18ff1fc",
+        "type": "link in",
+        "z": "25ebc86c9dfeabe1",
+        "name": "link in 2",
+        "links": [
+            "615beec8d2edf258"
+        ],
+        "x": 375,
+        "y": 660,
+        "wires": [
+            [
+                "322c97d9dffcaaa4",
+                "80cf9c2b65312e45",
+                "e49262dbd291e234",
+                "8e8ea010f0578e99",
+                "c4d152ce907ea608",
+                "da60a1b2538aaa96",
+                "23309f3bc5ddb1ce",
+                "63aa64b06767c2bf",
+                "cacf379d38929198",
+                "a9c16d93986af83e"
+            ]
+        ]
+    },
+    {
+        "id": "05e8d6e1a766149e",
+        "type": "link in",
+        "z": "25ebc86c9dfeabe1",
+        "name": "link in 3",
+        "links": [
+            "615beec8d2edf258"
+        ],
+        "x": 375,
+        "y": 1100,
+        "wires": [
+            [
+                "238431c4f8028fa6",
+                "25d6a5b447486626",
+                "5620e7f02c0ad07e",
+                "5481e30b593d5320",
+                "c699a2988bb6baf8",
+                "11a551eb7fc4f4dc",
+                "da127ac9f27e3e2d",
+                "6c5c085272f03891",
+                "493c207969dd7e2b",
+                "2b5cd737608ceaab"
+            ]
+        ]
+    },
+    {
+        "id": "cf0a639d4230e3bd",
+        "type": "ui_gauge",
+        "z": "25ebc86c9dfeabe1",
+        "name": "",
+        "group": "6981884ae00c53e8",
+        "order": 31,
+        "width": 3,
+        "height": 3,
+        "gtype": "gage",
+        "title": "temp31",
+        "label": "units",
+        "format": "{{value}}",
+        "min": "-10",
+        "max": "50",
+        "colors": [
+            "#0501f4",
+            "#1aea90",
+            "#ca3838"
+        ],
+        "seg1": "20",
+        "seg2": "29",
+        "diff": false,
+        "className": "",
+        "x": 1120,
+        "y": 420,
+        "wires": []
+    },
+    {
+        "id": "bec92e54c29bcae1",
+        "type": "mqtt in",
+        "z": "25ebc86c9dfeabe1",
+        "name": "",
+        "topic": "tkj/raspberry_pico/temp_AHT/31",
+        "qos": "0",
+        "datatype": "auto-detect",
+        "broker": "5e101f2a90da875b",
+        "nl": false,
+        "rap": true,
+        "rh": 0,
+        "inputs": 0,
+        "x": 770,
+        "y": 420,
+        "wires": [
+            [
+                "cf0a639d4230e3bd"
+            ]
+        ]
+    },
+    {
+        "id": "0be763af35ecba7c",
+        "type": "ui_gauge",
+        "z": "25ebc86c9dfeabe1",
+        "name": "",
+        "group": "6981884ae00c53e8",
+        "order": 32,
+        "width": 3,
+        "height": 3,
+        "gtype": "gage",
+        "title": "temp32",
+        "label": "units",
+        "format": "{{value}}",
+        "min": "-10",
+        "max": "50",
+        "colors": [
+            "#0501f4",
+            "#1aea90",
+            "#ca3838"
+        ],
+        "seg1": "20",
+        "seg2": "29",
+        "diff": false,
+        "className": "",
+        "x": 1120,
+        "y": 460,
+        "wires": []
+    },
+    {
+        "id": "2e233b536ee462ea",
+        "type": "mqtt in",
+        "z": "25ebc86c9dfeabe1",
+        "name": "",
+        "topic": "tkj/raspberry_pico/temp_AHT/32",
+        "qos": "0",
+        "datatype": "auto-detect",
+        "broker": "5e101f2a90da875b",
+        "nl": false,
+        "rap": true,
+        "rh": 0,
+        "inputs": 0,
+        "x": 770,
+        "y": 460,
+        "wires": [
+            [
+                "0be763af35ecba7c"
+            ]
+        ]
+    },
+    {
+        "id": "bf238356fa5620bf",
+        "type": "ui_gauge",
+        "z": "25ebc86c9dfeabe1",
+        "name": "",
+        "group": "6981884ae00c53e8",
+        "order": 33,
+        "width": 3,
+        "height": 3,
+        "gtype": "gage",
+        "title": "temp33",
+        "label": "units",
+        "format": "{{value}}",
+        "min": "-10",
+        "max": "50",
+        "colors": [
+            "#0501f4",
+            "#1aea90",
+            "#ca3838"
+        ],
+        "seg1": "20",
+        "seg2": "29",
+        "diff": false,
+        "className": "",
+        "x": 1120,
+        "y": 500,
+        "wires": []
+    },
+    {
+        "id": "82d43215268e3d31",
+        "type": "mqtt in",
+        "z": "25ebc86c9dfeabe1",
+        "name": "",
+        "topic": "tkj/raspberry_pico/temp_AHT/33",
+        "qos": "0",
+        "datatype": "auto-detect",
+        "broker": "5e101f2a90da875b",
+        "nl": false,
+        "rap": true,
+        "rh": 0,
+        "inputs": 0,
+        "x": 770,
+        "y": 500,
+        "wires": [
+            [
+                "bf238356fa5620bf"
+            ]
+        ]
+    },
+    {
+        "id": "59cb0525fb273ade",
+        "type": "ui_gauge",
+        "z": "25ebc86c9dfeabe1",
+        "name": "",
+        "group": "6981884ae00c53e8",
+        "order": 34,
+        "width": 3,
+        "height": 3,
+        "gtype": "gage",
+        "title": "temp34",
+        "label": "units",
+        "format": "{{value}}",
+        "min": "-10",
+        "max": "50",
+        "colors": [
+            "#0501f4",
+            "#1aea90",
+            "#ca3838"
+        ],
+        "seg1": "20",
+        "seg2": "29",
+        "diff": false,
+        "className": "",
+        "x": 1120,
+        "y": 540,
+        "wires": []
+    },
+    {
+        "id": "9bc7d0d6b36c9feb",
+        "type": "mqtt in",
+        "z": "25ebc86c9dfeabe1",
+        "name": "",
+        "topic": "tkj/raspberry_pico/temp_AHT/34",
+        "qos": "0",
+        "datatype": "auto-detect",
+        "broker": "5e101f2a90da875b",
+        "nl": false,
+        "rap": true,
+        "rh": 0,
+        "inputs": 0,
+        "x": 770,
+        "y": 540,
+        "wires": [
+            [
+                "59cb0525fb273ade"
+            ]
+        ]
+    },
+    {
+        "id": "166ccd7674ee8b0a",
+        "type": "ui_gauge",
+        "z": "25ebc86c9dfeabe1",
+        "name": "",
+        "group": "6981884ae00c53e8",
+        "order": 35,
+        "width": 3,
+        "height": 3,
+        "gtype": "gage",
+        "title": "temp35",
+        "label": "units",
+        "format": "{{value}}",
+        "min": "-10",
+        "max": "50",
+        "colors": [
+            "#0501f4",
+            "#1aea90",
+            "#ca3838"
+        ],
+        "seg1": "20",
+        "seg2": "29",
+        "diff": false,
+        "className": "",
+        "x": 1120,
+        "y": 580,
+        "wires": []
+    },
+    {
+        "id": "a6ff1fa2a5823f1d",
+        "type": "mqtt in",
+        "z": "25ebc86c9dfeabe1",
+        "name": "",
+        "topic": "tkj/raspberry_pico/temp_AHT/35",
+        "qos": "0",
+        "datatype": "auto-detect",
+        "broker": "5e101f2a90da875b",
+        "nl": false,
+        "rap": true,
+        "rh": 0,
+        "inputs": 0,
+        "x": 770,
+        "y": 580,
+        "wires": [
+            [
+                "166ccd7674ee8b0a"
+            ]
+        ]
+    },
+    {
+        "id": "c5f08638e75ec2a0",
+        "type": "ui_gauge",
+        "z": "25ebc86c9dfeabe1",
+        "name": "",
+        "group": "6981884ae00c53e8",
+        "order": 36,
+        "width": 3,
+        "height": 3,
+        "gtype": "gage",
+        "title": "temp36",
+        "label": "units",
+        "format": "{{value}}",
+        "min": "-10",
+        "max": "50",
+        "colors": [
+            "#0501f4",
+            "#1aea90",
+            "#ca3838"
+        ],
+        "seg1": "20",
+        "seg2": "29",
+        "diff": false,
+        "className": "",
+        "x": 1120,
+        "y": 620,
+        "wires": []
+    },
+    {
+        "id": "ecb40f4cfc1e3586",
+        "type": "mqtt in",
+        "z": "25ebc86c9dfeabe1",
+        "name": "",
+        "topic": "tkj/raspberry_pico/temp_AHT/36",
+        "qos": "0",
+        "datatype": "auto-detect",
+        "broker": "5e101f2a90da875b",
+        "nl": false,
+        "rap": true,
+        "rh": 0,
+        "inputs": 0,
+        "x": 770,
+        "y": 620,
+        "wires": [
+            [
+                "c5f08638e75ec2a0"
+            ]
+        ]
+    },
+    {
+        "id": "4b87140ef42a2480",
+        "type": "ui_gauge",
+        "z": "25ebc86c9dfeabe1",
+        "name": "",
+        "group": "6981884ae00c53e8",
+        "order": 37,
+        "width": 3,
+        "height": 3,
+        "gtype": "gage",
+        "title": "temp37",
+        "label": "units",
+        "format": "{{value}}",
+        "min": "-10",
+        "max": "50",
+        "colors": [
+            "#0501f4",
+            "#1aea90",
+            "#ca3838"
+        ],
+        "seg1": "20",
+        "seg2": "29",
+        "diff": false,
+        "className": "",
+        "x": 1120,
+        "y": 660,
+        "wires": []
+    },
+    {
+        "id": "f8d3838eb3dcb29d",
+        "type": "mqtt in",
+        "z": "25ebc86c9dfeabe1",
+        "name": "",
+        "topic": "tkj/raspberry_pico/temp_AHT/37",
+        "qos": "0",
+        "datatype": "auto-detect",
+        "broker": "5e101f2a90da875b",
+        "nl": false,
+        "rap": true,
+        "rh": 0,
+        "inputs": 0,
+        "x": 770,
+        "y": 660,
+        "wires": [
+            [
+                "4b87140ef42a2480"
+            ]
+        ]
+    },
+    {
+        "id": "cb7abd1292dfb388",
+        "type": "ui_gauge",
+        "z": "25ebc86c9dfeabe1",
+        "name": "",
+        "group": "6981884ae00c53e8",
+        "order": 38,
+        "width": 3,
+        "height": 3,
+        "gtype": "gage",
+        "title": "temp38",
+        "label": "units",
+        "format": "{{value}}",
+        "min": "-10",
+        "max": "50",
+        "colors": [
+            "#0501f4",
+            "#1aea90",
+            "#ca3838"
+        ],
+        "seg1": "20",
+        "seg2": "29",
+        "diff": false,
+        "className": "",
+        "x": 1120,
+        "y": 700,
+        "wires": []
+    },
+    {
+        "id": "e2a8d5a48eba2a8f",
+        "type": "mqtt in",
+        "z": "25ebc86c9dfeabe1",
+        "name": "",
+        "topic": "tkj/raspberry_pico/temp_AHT/38",
+        "qos": "0",
+        "datatype": "auto-detect",
+        "broker": "5e101f2a90da875b",
+        "nl": false,
+        "rap": true,
+        "rh": 0,
+        "inputs": 0,
+        "x": 770,
+        "y": 700,
+        "wires": [
+            [
+                "cb7abd1292dfb388"
+            ]
+        ]
+    },
+    {
+        "id": "af0f96e51353be1a",
+        "type": "ui_gauge",
+        "z": "25ebc86c9dfeabe1",
+        "name": "",
+        "group": "6981884ae00c53e8",
+        "order": 39,
+        "width": 3,
+        "height": 3,
+        "gtype": "gage",
+        "title": "temp39",
+        "label": "units",
+        "format": "{{value}}",
+        "min": "-10",
+        "max": "50",
+        "colors": [
+            "#0501f4",
+            "#1aea90",
+            "#ca3838"
+        ],
+        "seg1": "20",
+        "seg2": "29",
+        "diff": false,
+        "className": "",
+        "x": 1120,
+        "y": 740,
+        "wires": []
+    },
+    {
+        "id": "68fc8d9ca3331733",
+        "type": "mqtt in",
+        "z": "25ebc86c9dfeabe1",
+        "name": "",
+        "topic": "tkj/raspberry_pico/temp_AHT/39",
+        "qos": "0",
+        "datatype": "auto-detect",
+        "broker": "5e101f2a90da875b",
+        "nl": false,
+        "rap": true,
+        "rh": 0,
+        "inputs": 0,
+        "x": 770,
+        "y": 740,
+        "wires": [
+            [
+                "af0f96e51353be1a"
+            ]
+        ]
+    },
+    {
+        "id": "3dc3e12ec6872466",
+        "type": "ui_gauge",
+        "z": "25ebc86c9dfeabe1",
+        "name": "",
+        "group": "6981884ae00c53e8",
+        "order": 40,
+        "width": 3,
+        "height": 3,
+        "gtype": "gage",
+        "title": "temp40",
+        "label": "units",
+        "format": "{{value}}",
+        "min": "-10",
+        "max": "50",
+        "colors": [
+            "#0501f4",
+            "#1aea90",
+            "#ca3838"
+        ],
+        "seg1": "20",
+        "seg2": "29",
+        "diff": false,
+        "className": "",
+        "x": 1120,
+        "y": 780,
+        "wires": []
+    },
+    {
+        "id": "73cc0e34a49cde12",
+        "type": "mqtt in",
+        "z": "25ebc86c9dfeabe1",
+        "name": "",
+        "topic": "tkj/raspberry_pico/temp_AHT/40",
+        "qos": "0",
+        "datatype": "auto-detect",
+        "broker": "5e101f2a90da875b",
+        "nl": false,
+        "rap": true,
+        "rh": 0,
+        "inputs": 0,
+        "x": 770,
+        "y": 780,
+        "wires": [
+            [
+                "3dc3e12ec6872466"
+            ]
+        ]
+    },
+    {
+        "id": "d755a4962e5ba561",
+        "type": "ui_gauge",
+        "z": "25ebc86c9dfeabe1",
+        "name": "",
+        "group": "6981884ae00c53e8",
+        "order": 41,
+        "width": 3,
+        "height": 3,
+        "gtype": "gage",
+        "title": "temp41",
+        "label": "units",
+        "format": "{{value}}",
+        "min": "-10",
+        "max": "50",
+        "colors": [
+            "#0501f4",
+            "#1aea90",
+            "#ca3838"
+        ],
+        "seg1": "20",
+        "seg2": "29",
+        "diff": false,
+        "className": "",
+        "x": 1120,
+        "y": 860,
+        "wires": []
+    },
+    {
+        "id": "c888226f997eae47",
+        "type": "mqtt in",
+        "z": "25ebc86c9dfeabe1",
+        "name": "",
+        "topic": "tkj/raspberry_pico/temp_AHT/41",
+        "qos": "0",
+        "datatype": "auto-detect",
+        "broker": "5e101f2a90da875b",
+        "nl": false,
+        "rap": true,
+        "rh": 0,
+        "inputs": 0,
+        "x": 770,
+        "y": 860,
+        "wires": [
+            [
+                "d755a4962e5ba561"
+            ]
+        ]
+    },
+    {
+        "id": "d8dbaadd53e07430",
+        "type": "ui_gauge",
+        "z": "25ebc86c9dfeabe1",
+        "name": "",
+        "group": "6981884ae00c53e8",
+        "order": 42,
+        "width": 3,
+        "height": 3,
+        "gtype": "gage",
+        "title": "temp42",
+        "label": "units",
+        "format": "{{value}}",
+        "min": "-10",
+        "max": "50",
+        "colors": [
+            "#0501f4",
+            "#1aea90",
+            "#ca3838"
+        ],
+        "seg1": "20",
+        "seg2": "29",
+        "diff": false,
+        "className": "",
+        "x": 1120,
+        "y": 900,
+        "wires": []
+    },
+    {
+        "id": "3967f5e094371034",
+        "type": "mqtt in",
+        "z": "25ebc86c9dfeabe1",
+        "name": "",
+        "topic": "tkj/raspberry_pico/temp_AHT/42",
+        "qos": "0",
+        "datatype": "auto-detect",
+        "broker": "5e101f2a90da875b",
+        "nl": false,
+        "rap": true,
+        "rh": 0,
+        "inputs": 0,
+        "x": 770,
+        "y": 900,
+        "wires": [
+            [
+                "d8dbaadd53e07430"
+            ]
+        ]
+    },
+    {
+        "id": "075d93567a61c2d8",
+        "type": "ui_gauge",
+        "z": "25ebc86c9dfeabe1",
+        "name": "",
+        "group": "6981884ae00c53e8",
+        "order": 43,
+        "width": 3,
+        "height": 3,
+        "gtype": "gage",
+        "title": "temp43",
+        "label": "units",
+        "format": "{{value}}",
+        "min": "-10",
+        "max": "50",
+        "colors": [
+            "#0501f4",
+            "#1aea90",
+            "#ca3838"
+        ],
+        "seg1": "20",
+        "seg2": "29",
+        "diff": false,
+        "className": "",
+        "x": 1120,
+        "y": 940,
+        "wires": []
+    },
+    {
+        "id": "01207f1d37965135",
+        "type": "mqtt in",
+        "z": "25ebc86c9dfeabe1",
+        "name": "",
+        "topic": "tkj/raspberry_pico/temp_AHT/43",
+        "qos": "0",
+        "datatype": "auto-detect",
+        "broker": "5e101f2a90da875b",
+        "nl": false,
+        "rap": true,
+        "rh": 0,
+        "inputs": 0,
+        "x": 770,
+        "y": 940,
+        "wires": [
+            [
+                "075d93567a61c2d8"
+            ]
+        ]
+    },
+    {
+        "id": "5de5cd766e7da592",
+        "type": "ui_gauge",
+        "z": "25ebc86c9dfeabe1",
+        "name": "",
+        "group": "6981884ae00c53e8",
+        "order": 44,
+        "width": 3,
+        "height": 3,
+        "gtype": "gage",
+        "title": "temp44",
+        "label": "units",
+        "format": "{{value}}",
+        "min": "-10",
+        "max": "50",
+        "colors": [
+            "#0501f4",
+            "#1aea90",
+            "#ca3838"
+        ],
+        "seg1": "20",
+        "seg2": "29",
+        "diff": false,
+        "className": "",
+        "x": 1120,
+        "y": 980,
+        "wires": []
+    },
+    {
+        "id": "bbef67f4e54a91eb",
+        "type": "mqtt in",
+        "z": "25ebc86c9dfeabe1",
+        "name": "",
+        "topic": "tkj/raspberry_pico/temp_AHT/44",
+        "qos": "0",
+        "datatype": "auto-detect",
+        "broker": "5e101f2a90da875b",
+        "nl": false,
+        "rap": true,
+        "rh": 0,
+        "inputs": 0,
+        "x": 770,
+        "y": 980,
+        "wires": [
+            [
+                "5de5cd766e7da592"
+            ]
+        ]
+    },
+    {
+        "id": "47bf8fc99eb4d1ae",
+        "type": "ui_gauge",
+        "z": "25ebc86c9dfeabe1",
+        "name": "",
+        "group": "6981884ae00c53e8",
+        "order": 45,
+        "width": 3,
+        "height": 3,
+        "gtype": "gage",
+        "title": "temp45",
+        "label": "units",
+        "format": "{{value}}",
+        "min": "-10",
+        "max": "50",
+        "colors": [
+            "#0501f4",
+            "#1aea90",
+            "#ca3838"
+        ],
+        "seg1": "20",
+        "seg2": "29",
+        "diff": false,
+        "className": "",
+        "x": 1120,
+        "y": 1020,
+        "wires": []
+    },
+    {
+        "id": "0a274c6d476bca41",
+        "type": "mqtt in",
+        "z": "25ebc86c9dfeabe1",
+        "name": "",
+        "topic": "tkj/raspberry_pico/temp_AHT/45",
+        "qos": "0",
+        "datatype": "auto-detect",
+        "broker": "5e101f2a90da875b",
+        "nl": false,
+        "rap": true,
+        "rh": 0,
+        "inputs": 0,
+        "x": 770,
+        "y": 1020,
+        "wires": [
+            [
+                "47bf8fc99eb4d1ae"
+            ]
+        ]
+    },
+    {
+        "id": "531a133c67382b6b",
+        "type": "ui_gauge",
+        "z": "25ebc86c9dfeabe1",
+        "name": "",
+        "group": "6981884ae00c53e8",
+        "order": 46,
+        "width": 3,
+        "height": 3,
+        "gtype": "gage",
+        "title": "temp46",
+        "label": "units",
+        "format": "{{value}}",
+        "min": "-10",
+        "max": "50",
+        "colors": [
+            "#0501f4",
+            "#1aea90",
+            "#ca3838"
+        ],
+        "seg1": "20",
+        "seg2": "29",
+        "diff": false,
+        "className": "",
+        "x": 1120,
+        "y": 1060,
+        "wires": []
+    },
+    {
+        "id": "211d2735c7401273",
+        "type": "mqtt in",
+        "z": "25ebc86c9dfeabe1",
+        "name": "",
+        "topic": "tkj/raspberry_pico/temp_AHT/46",
+        "qos": "0",
+        "datatype": "auto-detect",
+        "broker": "5e101f2a90da875b",
+        "nl": false,
+        "rap": true,
+        "rh": 0,
+        "inputs": 0,
+        "x": 770,
+        "y": 1060,
+        "wires": [
+            [
+                "531a133c67382b6b"
+            ]
+        ]
+    },
+    {
+        "id": "93b0d73945f4b086",
+        "type": "ui_gauge",
+        "z": "25ebc86c9dfeabe1",
+        "name": "",
+        "group": "6981884ae00c53e8",
+        "order": 47,
+        "width": 3,
+        "height": 3,
+        "gtype": "gage",
+        "title": "temp47",
+        "label": "units",
+        "format": "{{value}}",
+        "min": "-10",
+        "max": "50",
+        "colors": [
+            "#0501f4",
+            "#1aea90",
+            "#ca3838"
+        ],
+        "seg1": "20",
+        "seg2": "29",
+        "diff": false,
+        "className": "",
+        "x": 1120,
+        "y": 1100,
+        "wires": []
+    },
+    {
+        "id": "849287eeeb5a2eca",
+        "type": "mqtt in",
+        "z": "25ebc86c9dfeabe1",
+        "name": "",
+        "topic": "tkj/raspberry_pico/temp_AHT/47",
+        "qos": "0",
+        "datatype": "auto-detect",
+        "broker": "5e101f2a90da875b",
+        "nl": false,
+        "rap": true,
+        "rh": 0,
+        "inputs": 0,
+        "x": 770,
+        "y": 1100,
+        "wires": [
+            [
+                "93b0d73945f4b086"
+            ]
+        ]
+    },
+    {
+        "id": "6b1e2bbff1d8ce7c",
+        "type": "ui_gauge",
+        "z": "25ebc86c9dfeabe1",
+        "name": "",
+        "group": "6981884ae00c53e8",
+        "order": 48,
+        "width": 3,
+        "height": 3,
+        "gtype": "gage",
+        "title": "temp48",
+        "label": "units",
+        "format": "{{value}}",
+        "min": "-10",
+        "max": "50",
+        "colors": [
+            "#0501f4",
+            "#1aea90",
+            "#ca3838"
+        ],
+        "seg1": "20",
+        "seg2": "29",
+        "diff": false,
+        "className": "",
+        "x": 1120,
+        "y": 1140,
+        "wires": []
+    },
+    {
+        "id": "382aaa7bfddc3f6c",
+        "type": "mqtt in",
+        "z": "25ebc86c9dfeabe1",
+        "name": "",
+        "topic": "tkj/raspberry_pico/temp_AHT/48",
+        "qos": "0",
+        "datatype": "auto-detect",
+        "broker": "5e101f2a90da875b",
+        "nl": false,
+        "rap": true,
+        "rh": 0,
+        "inputs": 0,
+        "x": 770,
+        "y": 1140,
+        "wires": [
+            [
+                "6b1e2bbff1d8ce7c"
+            ]
+        ]
+    },
+    {
+        "id": "50f04cbaca3f80ce",
+        "type": "ui_gauge",
+        "z": "25ebc86c9dfeabe1",
+        "name": "",
+        "group": "6981884ae00c53e8",
+        "order": 49,
+        "width": 3,
+        "height": 3,
+        "gtype": "gage",
+        "title": "temp49",
+        "label": "units",
+        "format": "{{value}}",
+        "min": "-10",
+        "max": "50",
+        "colors": [
+            "#0501f4",
+            "#1aea90",
+            "#ca3838"
+        ],
+        "seg1": "20",
+        "seg2": "29",
+        "diff": false,
+        "className": "",
+        "x": 1120,
+        "y": 1180,
+        "wires": []
+    },
+    {
+        "id": "9dfa881c0ac3e843",
+        "type": "mqtt in",
+        "z": "25ebc86c9dfeabe1",
+        "name": "",
+        "topic": "tkj/raspberry_pico/temp_AHT/49",
+        "qos": "0",
+        "datatype": "auto-detect",
+        "broker": "5e101f2a90da875b",
+        "nl": false,
+        "rap": true,
+        "rh": 0,
+        "inputs": 0,
+        "x": 770,
+        "y": 1180,
+        "wires": [
+            [
+                "50f04cbaca3f80ce"
+            ]
+        ]
+    },
+    {
+        "id": "0de9721db9564a46",
+        "type": "ui_gauge",
+        "z": "25ebc86c9dfeabe1",
+        "name": "",
+        "group": "6981884ae00c53e8",
+        "order": 50,
+        "width": 3,
+        "height": 3,
+        "gtype": "gage",
+        "title": "temp50",
+        "label": "units",
+        "format": "{{value}}",
+        "min": "-10",
+        "max": "50",
+        "colors": [
+            "#0501f4",
+            "#1aea90",
+            "#ca3838"
+        ],
+        "seg1": "20",
+        "seg2": "29",
+        "diff": false,
+        "className": "",
+        "x": 1120,
+        "y": 1220,
+        "wires": []
+    },
+    {
+        "id": "ca8f08fc63f57a2b",
+        "type": "mqtt in",
+        "z": "25ebc86c9dfeabe1",
+        "name": "",
+        "topic": "tkj/raspberry_pico/temp_AHT/50",
+        "qos": "0",
+        "datatype": "auto-detect",
+        "broker": "5e101f2a90da875b",
+        "nl": false,
+        "rap": true,
+        "rh": 0,
+        "inputs": 0,
+        "x": 770,
+        "y": 1220,
+        "wires": [
+            [
+                "0de9721db9564a46"
+            ]
+        ]
+    },
+    {
+        "id": "4ee6779fb64b99e9",
+        "type": "link in",
+        "z": "25ebc86c9dfeabe1",
+        "name": "link in 4",
+        "links": [
+            "615beec8d2edf258"
+        ],
+        "x": 935,
+        "y": 380,
+        "wires": [
+            [
+                "cf0a639d4230e3bd",
+                "0be763af35ecba7c",
+                "bf238356fa5620bf",
+                "59cb0525fb273ade",
+                "166ccd7674ee8b0a",
+                "c5f08638e75ec2a0",
+                "4b87140ef42a2480",
+                "cb7abd1292dfb388",
+                "af0f96e51353be1a",
+                "3dc3e12ec6872466"
+            ]
+        ]
+    },
+    {
+        "id": "c7f19632ec35d6df",
+        "type": "link in",
+        "z": "25ebc86c9dfeabe1",
+        "name": "link in 5",
+        "links": [
+            "615beec8d2edf258"
+        ],
+        "x": 935,
+        "y": 820,
+        "wires": [
+            [
+                "d755a4962e5ba561",
+                "d8dbaadd53e07430",
+                "075d93567a61c2d8",
+                "5de5cd766e7da592",
+                "47bf8fc99eb4d1ae",
+                "531a133c67382b6b",
+                "93b0d73945f4b086",
+                "6b1e2bbff1d8ce7c",
+                "50f04cbaca3f80ce",
+                "0de9721db9564a46"
+            ]
+        ]
+    },
+    {
+        "id": "d63bba9503877ede",
+        "type": "inject",
+        "z": "25ebc86c9dfeabe1",
+        "name": "",
+        "props": [
+            {
+                "p": "payload"
+            },
+            {
+                "p": "topic",
+                "vt": "str"
+            }
+        ],
+        "repeat": "",
+        "crontab": "",
+        "once": false,
+        "onceDelay": 0.1,
+        "topic": "",
+        "payload": "22",
+        "payloadType": "num",
+        "x": 170,
+        "y": 180,
+        "wires": [
+            [
+                "615beec8d2edf258"
+            ]
+        ]
+    },
+    {
+        "id": "4203a43b86599141",
+        "type": "ui_button",
+        "z": "25ebc86c9dfeabe1",
+        "name": "",
+        "group": "6981884ae00c53e8",
+        "order": 51,
+        "width": 3,
+        "height": 1,
+        "passthru": false,
+        "label": "reset",
+        "tooltip": "",
+        "color": "",
+        "bgcolor": "",
+        "className": "",
+        "icon": "",
+        "payload": "",
+        "payloadType": "str",
+        "topic": "topic",
+        "topicType": "msg",
+        "x": 190,
+        "y": 140,
+        "wires": [
+            [
+                "dac3c737e99f2de2"
+            ]
+        ]
+    },
+    {
+        "id": "dac3c737e99f2de2",
+        "type": "template",
+        "z": "25ebc86c9dfeabe1",
+        "name": "0",
+        "field": "payload",
+        "fieldType": "msg",
+        "format": "handlebars",
+        "syntax": "mustache",
+        "template": "0",
+        "output": "str",
+        "x": 310,
+        "y": 140,
+        "wires": [
+            [
+                "615beec8d2edf258"
+            ]
+        ]
+    },
+    {
+        "id": "23224d39d2366a5c",
+        "type": "ui_button",
+        "z": "25ebc86c9dfeabe1",
+        "name": "",
+        "group": "6981884ae00c53e8",
+        "order": 53,
+        "width": 3,
+        "height": 1,
+        "passthru": false,
+        "label": "min",
+        "tooltip": "",
+        "color": "",
+        "bgcolor": "",
+        "className": "",
+        "icon": "",
+        "payload": "",
+        "payloadType": "str",
+        "topic": "topic",
+        "topicType": "msg",
+        "x": 190,
+        "y": 100,
+        "wires": [
+            [
+                "7aea57a68efbc3b7"
+            ]
+        ]
+    },
+    {
+        "id": "eb93a90b6abe23d7",
+        "type": "ui_button",
+        "z": "25ebc86c9dfeabe1",
+        "name": "",
+        "group": "6981884ae00c53e8",
+        "order": 52,
+        "width": 3,
+        "height": 1,
+        "passthru": false,
+        "label": "max",
+        "tooltip": "",
+        "color": "",
+        "bgcolor": "",
+        "className": "",
+        "icon": "",
+        "payload": "",
+        "payloadType": "str",
+        "topic": "topic",
+        "topicType": "msg",
+        "x": 190,
+        "y": 60,
+        "wires": [
+            [
+                "c100669d5994dd26"
+            ]
+        ]
+    },
+    {
+        "id": "7aea57a68efbc3b7",
+        "type": "template",
+        "z": "25ebc86c9dfeabe1",
+        "name": "-10",
+        "field": "payload",
+        "fieldType": "msg",
+        "format": "handlebars",
+        "syntax": "mustache",
+        "template": "-10",
+        "output": "str",
+        "x": 310,
+        "y": 100,
+        "wires": [
+            [
+                "615beec8d2edf258"
+            ]
+        ]
+    },
+    {
+        "id": "c100669d5994dd26",
+        "type": "template",
+        "z": "25ebc86c9dfeabe1",
+        "name": "50",
+        "field": "payload",
+        "fieldType": "msg",
+        "format": "handlebars",
+        "syntax": "mustache",
+        "template": "50",
+        "output": "str",
+        "x": 310,
+        "y": 60,
+        "wires": [
+            [
+                "615beec8d2edf258"
+            ]
+        ]
+    }
+]
