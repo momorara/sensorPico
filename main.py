@@ -37,7 +37,7 @@ v1.3
 
 THPCW_01.py  mqtt対応
 """
-main_py = 0 # 1の時は自己リブートを有効にする。
+main_py = 1 # 1の時は自己リブートを有効にする。
 
 import time
 import gc
