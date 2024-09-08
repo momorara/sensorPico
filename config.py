@@ -10,6 +10,7 @@ ID PASS LINE_token
 v1.0
 2023/8/11   ambient testチャンネル対応
 v1.1        初期設定でも最低限の動作をするように改造
+2024/9/8    メール追加
 """
 def wifi_set():
     return 1 # wifi使用しない時は0
@@ -21,6 +22,16 @@ def ID_PASS():
     password    = 'your password'
     return ssid,password
 
+def mail_setting():
+    mail_onoff = 1                              # SWのonでメールを送信するかどうかを設定
+    MailServerName = "smtp.mail.yahoo.co.jp"    # メールサーバー名
+    UserName = "coxxxsum@yahoo.co.jp"           # プロバイダーのアカウント(ユーザー名)
+    UserPass = "yahxxx731"                      # プロバイダーのパスワード
+    toMailAddres ="pc_xxxbox@mineo.jp"          # メールの宛先
+    mail_title = "SW_test_ON"
+    mail_body  = "SW_test_test"
+    return mail_onoff,MailServerName,UserName,UserPass,toMailAddres,mail_title,mail_bo
+            
 def hosei():
     # センサーのオフセット誤差を補正する補正値です。
     temp  = 0
