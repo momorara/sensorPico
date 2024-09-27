@@ -42,7 +42,7 @@ def hosei():
 def ambi():
     # ambientのテストチャンネル ID,ライトキー
     # ご自身のambient設定に変更してください。
-    ch_ID,write_KEY = 68358,"3a0553e59b39b1ef"
+    ch_ID,write_KEY = 61158,"3a05xxx9b39b1ef"
     return ch_ID,write_KEY 
 
 def i2c_ini():
