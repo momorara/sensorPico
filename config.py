@@ -30,7 +30,7 @@ def mail_setting():
     toMailAddres ="pc_xxxbox@mineo.jp"          # メールの宛先
     mail_title = "SW_test_ON"
     mail_body  = "SW_test_test"
-    return mail_onoff,MailServerName,UserName,UserPass,toMailAddres,mail_title,mail_bo
+    return mail_onoff,MailServerName,UserName,UserPass,toMailAddres,mail_title,mail_body
             
 def hosei():
     # センサーのオフセット誤差を補正する補正値です。
