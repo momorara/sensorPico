@@ -6,7 +6,7 @@
 部品キット、完成品、システムＳＤの提供ありなしにかかわらず、動作のためのサポートをさせていただきます。
 
 サポートの方法
-・メールによるサポートとさせていただきます。pc_mailbox@mineo.jp
+・メールによるサポートとさせていただきます。tkj-works@mbr.nifty.com
 ・サポートページ　https://github.com/momorara/sensorPico
 ・サポートコミュニティー　https://www.facebook.com/groups/3773038759434230
 
@@ -23,7 +23,7 @@
 
 
 連絡先
-川端孝宣　pc_mailbox@mineo.jp
+川端孝宣　tkj-works@mbr.nifty.com
 
 
 p.s 部品キットが欲しい方は、別途メールしてください。
