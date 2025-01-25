@@ -54,3 +54,4 @@ git clone https://github.com/momorara/sensorPico<br>
 <h4><<サポート窓口>></h4>
   メールアドレスが　tkj-works@mbr.nifty.com に変更になっています。<br>
   資料等を修正中ですが、ご注意ください。<br>
+  サポートコミュニティー　https://www.facebook.com/groups/3773038759434230<br>
