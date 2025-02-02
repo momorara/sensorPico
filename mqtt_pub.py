@@ -3,6 +3,8 @@
 トピックとデータを引数にmqtt_sendを実行すると
 指定されたプローカーに対にしてパブリッシュします。
 2024/08/24  mqttのコアプログラムの名前を変え、インストールしやすいようにした
+2025/02/02  mqttのプローカーを変更
+            mqtt送信タイミングを乱数でずらす
 """
 import network
 import time
@@ -12,6 +14,7 @@ import machine
 # from umqtt.simple import MQTTClient
 # 同一階層にコピーするだけでよくするのと、わかりやすい名前とした
 from lib_mqtt import MQTTClient
+import random
 
 # # Wi-Fi接続情報
 # wifi接続できているものとする
@@ -43,6 +46,12 @@ def connect_mqtt():
 # メインプログラム
 def mqtt_send(topic,data):
     print(topic,data)
+
+    #送信時間をずらす
+    random_value = random.uniform(1.0, 10.0)
+    # print(random_value)
+    time.sleep(random_value)
+
     connect_wifi()
     client = connect_mqtt()
     try:
