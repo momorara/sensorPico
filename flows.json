@@ -128,7 +128,7 @@
         "id": "5e101f2a90da875b",
         "type": "mqtt-broker",
         "name": "Free Public MQTT 5 Broker Server",
-        "broker": "broker.emqx.io",
+        "broker": "broker.hivemq.com",
         "port": "1883",
         "clientid": "",
         "autoConnect": true,
