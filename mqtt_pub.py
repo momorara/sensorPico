@@ -17,7 +17,7 @@ from lib_mqtt import MQTTClient
 # wifi接続できているものとする
 
 # MQTTブローカー情報
-broker = 'broker.emqx.io'
+broker = 'broker.hivemq.com'
 client_id = ubinascii.hexlify(machine.unique_id())
 print(client_id)
 
