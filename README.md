@@ -50,7 +50,8 @@ git clone https://github.com/momorara/sensorPico<br>
 2024/09/02   オプションとして、LINEへのメッセージ送信ライブラリを追加しました。LINEへの通知を考えておられる方は参考にして下さい。ただし、トークンの取得はネットで調べて下さい。<br>
 2024/09/08   メール送信ライブラリを追加しました。config.pyのメール関係設定をした上でmailSend_01.pyを起動するとメール送信できます。yahooメールでは送信できました。<br>
 2024/10/27   「LINE Notify提供終了」がLINEで発表されています。https://notify-bot.line.me/closing-announce<br>
-025/02/02　   mqtt_pub.pyを更新しました。<br>
+2025/02/02　   mqtt_pub.pyを更新しました。<br>
+2025/02/10   web_Appについて picoがつくれるwebはhttpになります。セキュリティの関係で、httpを見たり、httpのサイトへの送信ができないブラウザが増えてきて、使える環境が制限されてきました。当方でもsafariとiPhoneからは使えないみたいです。なので、申し訳ないですが、サポート外とさせていただきます。
    
 <h4><<サポート窓口>></h4>
   メールアドレスが　tkj-works@mbr.nifty.com に変更になっています。<br>
