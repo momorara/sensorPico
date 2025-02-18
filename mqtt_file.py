@@ -9,7 +9,7 @@
 def topic_get():
     file_name = "mtqq_topic_no.txt"
     topic     = "tkj/raspberry_pico/temp_AHT/" 
-    glaph_n   = 47
+    glaph_n   = 50
     try:
         with open(file_name): # あれば、その数字をmtqq_topic_noとする
             print(f"{file_name} は存在します。")

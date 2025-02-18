@@ -113,11 +113,17 @@ class Ambient:
 
 
 """        チャネルID       ライトキー        """
-# am = Ambient(518, "644c84a1e4")
+# pico 環境設定test
+am = Ambient(68358, "3a0553e59b39b1ef")
 """"""""""""""""""""""""""""""""""""""""""""""""""""""
 
 def ambient(temp,humi,press,Cds):
     res = am.send({"d1": temp,"d2":humi,"d3":press,"d4":Cds})
+    print(res.status_code)
+    if res.status_code == 200:
+        print("ok")
+    else:
+        print("NG")
 
 def main():
     temp,humi,press,Cds = 25,55,999,80

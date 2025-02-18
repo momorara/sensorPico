@@ -80,9 +80,9 @@ def OLED_mes(mes):
 def main():
     temp,humdy,press = 24.8,13.9,1323.5
     OLED(temp,humdy,press)
-    time.sleep(3)
+    time.sleep(2)
     OLED_mes("test")
-    time.sleep(3)
+    time.sleep(1)
     OLED_mes("")
 
 if __name__=='__main__':

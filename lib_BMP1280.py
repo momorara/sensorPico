@@ -14,9 +14,9 @@ def BMP():
     if BMPsesorName == 'BMP180' :
         try:
             temp,press1 = lib_BMP180.BMP180(1)
-            time.sleep(1)
+            time.sleep(0.1)
         except:
-            time.sleep(3)
+            time.sleep(1)
             try:
                 temp,press1 = lib_BMP180.BMP180(1)
             except:
@@ -27,9 +27,9 @@ def BMP():
     if BMPsesorName == 'BMP280' :
         try:
             temp,press1 = lib_BMP280.bmp280_dataRead()
-            time.sleep(1)
+            time.sleep(0.1)
         except:
-            time.sleep(3)
+            time.sleep(1)
             try:
                 temp,press1 = lib_BMP280.bmp280_dataRead()
             except:
