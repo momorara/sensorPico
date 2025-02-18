@@ -90,16 +90,17 @@ def ambient(temp,humi,press,Cds ,temp_cpu,temp_diff,wbgt,stat=1):
         res = am.send({"d1": temp,"d2":humi,           "d4":Cds,"d5": stat,"d6":temp_cpu,"d7":temp_diff,"d8":wbgt })
     if temp == None and press == None:
         res = am.send({                                "d4":Cds,"d5": stat,"d6":temp_cpu,"d7":temp_diff,"d8":wbgt })
-    print(res.status_code)
+    print( "amb",res.status_code)
     if res.status_code == 200:# ambient成功
         print("ok")
-        # mqttのtopicを決定
-        topic = mqtt_file.topic_get()
-        print(topic)
-        # topicに温度を送信
-        mqtt_pub.mqtt_send(topic,temp)
     else:
         print("NG")
+
+    # mqttのtopicを決定
+    topic = mqtt_file.topic_get()
+    print(topic)
+    # topicに温度を送信
+    mqtt_pub.mqtt_send(topic,temp)
 
 
 def ambient_stat(stat):
@@ -148,13 +149,14 @@ def main():
     SSD1306.OLED(temp,humi,press)
     # wifi 接続
     ip_add = "no connect"
+    wifi_stat = 0
     if wifi == 1:
-        ip_add = wifi_onoff.wifi_onoff('on')
+        ip_add,wifi_stat = wifi_onoff.wifi_onoff('on')
         # NTP にて時刻合わせ
         lib_NTP.NTP_set()
         lib_LED.LEDonoff()
         lib_LED.end_LED()
-    print("ip:",ip_add)
+    print("ip:",ip_add,wifi_stat)
     SSD1306.OLED_mes(ip_add)
     time.sleep(10)
     ambient_stat(10)        # テスト　10
