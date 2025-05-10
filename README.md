@@ -9,7 +9,7 @@ sensorbard for pico
 
 <h4><<概要>></h4>
 　Raspberry Pi picoWを使った環境測定ボード<br>
-　センサーにAHT10、BMP180(or BMP280)を使用して気温、湿度、気圧を測定します。<br>
+　センサーにAHT10(or AHT30)、BMP180(or BMP280)を使用して気温、湿度、気圧を測定します。<br>
 　さらにCdsセンサーも搭載して、明暗度も測定できます。<br>
 　それらのデータはwifiを使いambientという計測値表示サービスに投げていますので、表示データ保存が可能となっています。
 　　*参考サイト==> https://ambidata.io/bd/board.html?id=59777 <br>
@@ -57,6 +57,7 @@ https://micropython.org/download/RPI_PICO_W/<br>
 2024/10/27   「LINE Notify提供終了」がLINEで発表されています。https://notify-bot.line.me/closing-announce<br>
 2025/02/02　   mqtt_pub.pyを更新しました。<br>
 2025/02/10   web_Appについて:picoがつくれるwebサイトはhttpになります。セキュリティの関係で、httpを見たり、webサイトへの送信ができないブラウザが増えてきて、使える環境が制限されてきました。当方でもsafariとiPhoneからは使えないみたいです。なので、申し訳ないですが、サポート外とさせていただきます。m(..)m<br>
+2025/05/10   資料では、AHT10を使っていますが、AHT30でも同様に使えます。<br>
    
 <h4><<サポート窓口>></h4>
   メールアドレスが　tkj-works@mbr.nifty.com に変更になっています。<br>
