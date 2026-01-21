@@ -1,0 +1,11 @@
+【使用ソフトウェアについて】
+
+本教材では、MicroPython およびその標準ライブラリ、
+ならびに以下のオープンソースライブラリを使用しています。
+
+- MicroPython（MIT License）
+- ssd1306 OLED driver（MIT License）
+- urequests（MIT License）
+- Ambient MicroPython library（MIT License）
+
+これらはすべてオープンソースライセンスのもとで提供されています。
