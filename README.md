@@ -67,6 +67,9 @@ https://micropython.org/download/RPI_PICO_W/<br>
   サポートコミュニティー　https://www.facebook.com/groups/3773038759434230<br>
 <br>
 -------------------------------------------<br>
+Raspberry Pi sensor expansion board<br>
+Python example included<br>
+Purchase here:<br>
 基板の販売について、以下のショップにて扱っています。<br>
 BASEショップ<br>
 https://raspi.thebase.in/<br>
