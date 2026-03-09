@@ -16,10 +16,10 @@ def ID_PASS():
     # wifiのssidとパスワード
     #  ソーズ
     ssid        = 'TKJ'
-    password    = '19601121'
+    password    = 'xxxx'
     # izumo
     #ssid        = 'snow4'
-    #password    = '0728244490'
+    #password    = '0xxxx'
     return ssid,password
 
 def hosei():
@@ -32,9 +32,9 @@ def hosei():
 def ambi():
     # ambientのチャンネルIDとライトキーを設定
     #  ソーズ
-    ch_ID,write_KEY = 64371,"64fd1b3081c33a79"
+    ch_ID,write_KEY = 6xx71,"64fxxxc33a79"
     # izumo
-    ch_ID,write_KEY = 52618,"644c8298f2d4a1e4"
+    ch_ID,write_KEY = 52xx8,"644c8xxx4a1e4"
     return ch_ID,write_KEY 
 
 def i2c_ini():
