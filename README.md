@@ -1,4 +1,4 @@
-# sensorPico
+# sensorPico v2
 sensorbard for pico
 
 
@@ -9,7 +9,7 @@ sensorbard for pico
 
 <h4><<概要>></h4>
 　Raspberry Pi picoWを使った環境測定ボード<br>
-　センサーにAHT10(or AHT30)、BMP180(or BMP280)を使用して気温、湿度、気圧を測定します。<br>
+　センサーにAHT30、BMP280を使用して気温、湿度、気圧を測定します。<br>
 　さらにCdsセンサーも搭載して、明暗度も測定できます。<br>
 　それらのデータはwifiを使いambientという計測値表示サービスに投げていますので、表示データ保存が可能となっています。
 　　*参考サイト==> https://ambidata.io/bd/board.html?id=59777 <br>
