@@ -70,8 +70,5 @@ https://micropython.org/download/RPI_PICO_W/<br>
 Raspberry Pi sensor expansion board<br>
 Python example included<br>
 Purchase here:<br>
-基板の販売について、以下のショップにて扱っています。<br>
-BASEショップ<br>
-https://raspi.thebase.in/<br>
-スイッチサイエンス<br>
-https://www.switch-science.com/search?q=tkj<br>
+現在キャンプファイヤーでクラウドファンディング中<br>
+   https://camp-fire.jp/projects/939302/view<br>
