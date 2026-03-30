@@ -60,6 +60,7 @@ https://micropython.org/download/RPI_PICO_W/<br>
 2025/02/02　   mqtt_pub.pyを更新しました。<br>
 2025/02/10   web_Appについて:picoがつくれるwebサイトはhttpになります。セキュリティの関係で、httpを見たり、webサイトへの送信ができないブラウザが増えてきて、使える環境が制限されてきました。当方でもsafariとiPhoneからは使えないみたいです。なので、申し訳ないですが、サポート外とさせていただきます。m(..)m<br>
 2025/05/10   資料では、AHT10を使っていますが、AHT30でも同様に使えます。<br>
+2026/3/03   sensorPico v02としてリリース
    
 <h4><<サポート窓口>></h4>
   メールアドレスが　tkj-works@mbr.nifty.com に変更になっています。<br>
