@@ -15,8 +15,9 @@ import sys
 
 import config
 import SSD1306
-import lib_BMP180
+# import lib_BMP180
 import lib_AHT10
+import lib_BMP1280
 
 # エラーが2回続けば、データ欠損として、Noneとする。
 def keisoku():
@@ -28,14 +29,8 @@ def keisoku():
             temp1,humi1 = lib_AHT10.aht10(1)
         except:
             temp1,humi1 = None,None
-    try:
-        temp,press1 = lib_BMP180.BMP180(1)
-    except:
-        time.sleep(1)
-        try:
-            temp,press1 = lib_BMP180.BMP180(1)
-        except:
-            temp,press1 = None,None
+
+    temp,press1 = lib_BMP1280.BMP()
     return press1,temp1,humi1
 
 # センサからデータを読み取る関数（具体的なセンサに合わせて修正が必要）
