@@ -36,6 +36,7 @@ git clone https://github.com/momorara/sensorPico<br>
 2025/04/19 ファームウェア(RPI_PICO_W-20250415-v1.25.0.uf2)　で動作確認<br>
 2025/08/11 ファームウェア(RPI_PICO_W-20250809-v1.26.0.uf2)　で動作確認<br>
 2025/12/13 ファームウェア(RPI_PICO_W-20251209-v1.27.0.uf2)　で動作確認<br>
+2026/04/08 ファームウェア(RPI_PICO_W-20260406-v1.28.0.uf2)　で動作確認<br>
 
 <h4><<ファームウェア置き場>></h4>
 https://micropython.org/download/RPI_PICO_W/<br>
