@@ -25,7 +25,7 @@ def topic_get():
         print(f"{file_name} は存在しません。")
         import random
         # 1からglaph_nまでの乱数を生成
-        mtqq_topic_no = random.randint(10, glaph_n)
+        mtqq_topic_no = random.randint(20, glaph_n)
         print(mtqq_topic_no)
         with open(file_name, "w") as file:
             # ファイルに文字を書き込む
