@@ -9,7 +9,7 @@
 def topic_get():
     file_name = "mtqq_topic_no.txt"
     topic     = "tkj/raspberry_pico/temp_AHT/" 
-    glaph_n   = 45
+    glaph_n   = 41
     try:
         with open(file_name): # あれば、その数字をmtqq_topic_noとする
             print(f"{file_name} は存在します。")
@@ -25,7 +25,7 @@ def topic_get():
         print(f"{file_name} は存在しません。")
         import random
         # 1からglaph_nまでの乱数を生成
-        mtqq_topic_no = random.randint(1, glaph_n)
+        mtqq_topic_no = random.randint(10, glaph_n)
         print(mtqq_topic_no)
         with open(file_name, "w") as file:
             # ファイルに文字を書き込む
