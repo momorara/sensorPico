@@ -65,6 +65,7 @@ https://micropython.org/download/RPI_PICO_W/<br>
 2026/04/01   sensorPico v02としてリリース<br>
 2026/04/03   webアプリのBMP280対応<br>
 2026/08/15   ambient障害復旧した模様です。<br>
+2026/08/24  NTPを日本国内のNTPサーバーに変更
    
 <h4><<サポート窓口>></h4>
   メールアドレスが　tkj-works@mbr.nifty.com に変更になっています。<br>
