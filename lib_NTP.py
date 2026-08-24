@@ -3,12 +3,16 @@
 """
 2023/05/21  NTPにて時刻あわせ
 v1.0
+2026/08/24  日本国内のNTPサーバーに変更
+v1.1
 """
 
 def NTP_set():
     import network
     import time
     import ntptime
+    # 日本国内のNTPサーバーに変更
+    ntptime.host = "ntp.nict.jp"
     #日時取得
     ntptime.settime()
     UTC_OFFSET = 9 * 60 * 60
