@@ -1,3 +1,6 @@
+# 緊急告知
+ambientが現在ダウンしている模様です。<br>
+なので、基板上のOLEDでのみ表示を確認できません。<br>
   
 # sensorPico v2
 sensorbard for pico
