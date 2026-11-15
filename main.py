@@ -51,7 +51,7 @@ THPCW_07.py  2026/08/28 ambiリカバリ追加
 
 THPCW_07から　sensorPico_01 と改名
 """
-main_py = 0 # 1の時は自己リブートを有効にする。
+main_py = 1 # 1の時は自己リブートを有効にする。
 
 import time
 import gc
