@@ -34,10 +34,24 @@ v1.2
 2023/09/09  wbgtでLED点灯、冬季のウイルス警告も追加
 v1.3
 2024/08/23  mqtt対応
+2025/05/07  LEDが点滅しているので、プログラムは動作しているようだが、
+            ambientへの送信が止まっている時がある。
+            これをなんとかする方法を考えたい。
+            ・ambientでの送信後の状態を保存する。
+2025/09/11  ・ambientでの送信失敗の日時をファイル保存
+2025/09/17  リブート時にファィル保存
+2025/10/01  ambi失敗5回でリブート
+2025/10/03  リブートの場所を保存
+2026/08/28  ambiリカバリ追加
 
-THPCW_01.py  mqtt対応
+THPCW_04.py  2025/10/01
+THPCW_07.py  2026/08/28 ambiリカバリ追加
+
+# ambient停止を受けて別サービスに移行
+
+THPCW_07から　sensorPico_01 と改名
 """
-main_py = 1 # 1の時は自己リブートを有効にする。
+main_py = 0 # 1の時は自己リブートを有効にする。
 
 import time
 import gc
@@ -58,13 +72,13 @@ import lib_wbgt
 
 import mqtt_file
 import mqtt_pub
+import utime
+import os
 
-import ambient
-# Ambient対応 
-ch_ID,write_KEY  = config.ambi()
-"""                チャネルID   ライトキー        """
-am = ambient.Ambient(ch_ID, write_KEY)
-""""""""""""""""""""""""""""""""""""""""""""""""""
+import blynk
+import MiniViz
+import wifi_connect
+
 measu_cycle = config.measu_cycle()
 wifi = config.wifi_set ()
 print( "wifi:",wifi)
@@ -79,38 +93,29 @@ led1.off()
 time.sleep(0.5)
 led2.off()
 
-# データがNoneの場合は欠損処理をする
-def ambient(temp,humi,press,Cds ,temp_cpu,temp_diff,wbgt,stat=1):
-    #return
-    if temp != None and press != None:
-        res = am.send({"d1": temp,"d2":humi,"d3":press,"d4":Cds,"d5": stat,"d6":temp_cpu,"d7":temp_diff,"d8":wbgt })
-    if temp == None and press != None:
-        res = am.send({                     "d3":press,"d4":Cds,"d5": stat,"d6":temp_cpu,"d7":temp_diff,"d8":wbgt })
-    if temp != None and press == None:
-        res = am.send({"d1": temp,"d2":humi,           "d4":Cds,"d5": stat,"d6":temp_cpu,"d7":temp_diff,"d8":wbgt })
-    if temp == None and press == None:
-        res = am.send({                                "d4":Cds,"d5": stat,"d6":temp_cpu,"d7":temp_diff,"d8":wbgt })
-    print( "amb",res.status_code)
-    if res.status_code == 200:# ambient成功
-        print("ok")
-    else:
-        print("NG")
+SSID, PASS = config.ID_PASS()
 
-    # mqttのtopicを決定
-    topic = mqtt_file.topic_get()
-    print(topic)
-    # topicに温度を送信
-    mqtt_pub.mqtt_send(topic,temp)
+def time_stamp(no):
+    # JSTに直す（日本はUTC+9）
+    t = utime.time() + 9*60*60
+    tm = utime.localtime(t)
+    # 日時を文字列に整形
+    date_str = "{:04d}-{:02d}-{:02d} {:02d}:{:02d}:{:02d}".format(
+        tm[0], tm[1], tm[2], tm[3], tm[4], tm[5]
+    )
+    date_str = date_str + " " + str(no)
+    print("現在日時TS:", date_str)
+    # ===== ファイルに保存 =====
+    with open("time_stamp.txt", "a") as f:
+        f.write(date_str + "\n")
+    if no == -1:
+        with open("time_stamp.txt", "w") as f:
+            f.write(date_str + "\n")  
 
-
-def ambient_stat(stat):
-    try:
-        res = am.send({"d5": stat})
-    except:
-        pass
 
 # エラーが2回続けば、データ欠損として、Noneとする。
 def keisoku():
+    time_stamp(2)
     try:
         temp1,humi1 = lib_AHT10.aht10(1)
         time.sleep(1)
@@ -142,6 +147,7 @@ def bootSW():
     else:
         return 0
 
+
 def main():
     lib_LED.LEDonoff()
     temp,humi,press = 0,0,0
@@ -149,27 +155,25 @@ def main():
     SSD1306.OLED(temp,humi,press)
     # wifi 接続
     ip_add = "no connect"
-    wifi_stat = 0
     if wifi == 1:
-        ip_add,wifi_stat = wifi_onoff.wifi_onoff('on')
+        ip_add = wifi_onoff.wifi_onoff('on')
         # NTP にて時刻合わせ
         lib_NTP.NTP_set()
         lib_LED.LEDonoff()
         lib_LED.end_LED()
-    print("ip:",ip_add,wifi_stat)
+    print("ip:",ip_add)
     SSD1306.OLED_mes(ip_add)
-    time.sleep(10)
-    ambient_stat(10)        # テスト　10
     time.sleep(10)
 
     UTC_OFFSET = 9 * 60 * 60
     while True:
+        time_stamp(-1)
         # センサー測定
         press,temp,humi = keisoku()
         Cds = lib_Cds.Cds(1)
         temp_cpu = lib_CPUtemp.CPU_temp()
         temp_diff = int((temp_cpu - temp)*10+0.5)/10
-
+        time_stamp(1)
         # 夏季 暑さ指数
         try:
             wbgt = lib_wbgt.calc(temp,humi)
@@ -184,65 +188,28 @@ def main():
         # 冬季ウイルス警報
         if temp <= 17                :led1.on()
         if temp <= 20 and humi <= 45 :led2.on()
+        time_stamp(2)
 
-        # 999って値が表示されたので、その場合は欠損とする。
-        if temp > 100 :
-            temp = None
-            time.sleep(10)
-            ambient_stat(6) 
-            time.sleep(10)
-        if humi > 100 :
-            humi = None
-            time.sleep(10)
-            ambient_stat(7) 
-            time.sleep(10)
-        
         now = time.localtime(time.time() + UTC_OFFSET)
         print(now)
         print('気温:',temp,' 湿度:',humi,' 気圧:',press,' 明暗:',Cds,' cpuTEMP:',temp_cpu," deff_T:",temp_diff," WBGT:",wbgt)
         SSD1306.OLED(temp,humi,press)
-
-        # 1つでもエラー値があれば、amientに投げない
+        time_stamp(4)
+        # 1つでもエラー値があれば、a投げない
         if press != 600 and temp != 100 and humi != 0:
             try:
-                ambient(temp,humi,press,Cds,temp_cpu,temp_diff,wbgt)
+                wifi_connect.keep_alive()
+                human = 0
+                blynk.send_data(temp, humi, press, Cds, human)
+                MiniViz.send_data(temp, humi, press, Cds, human)
                 time.sleep(10)
             except:  
-                time.sleep(10)
-                ambient_stat(2)
-                time.sleep(10)
-                try:
-                    ambient(temp,humi,press,Cds,temp_cpu,temp_diff,wbgt)
-                    time.sleep(10)
-                except:
-                    time.sleep(60)
-                    ambient_stat(3)
-                    time.sleep(10)
-                    try:
-                        ambient(temp,humi,press,Cds,temp_cpu,temp_diff,wbgt)
-                        time.sleep(10)
-                    except:
-                        time.sleep(10)
-                        print('err ambient1')
-                        ambient_stat(4) 
-                        time.sleep(10)
-                        if main_py == 1:
-                            # リブート
-                            machine.reset()
+                time_stamp(2)
         else:
-            try:
-                time.sleep(10)
-                ambient_stat(8)
-                time.sleep(10)
-                ambient(temp,humi,press,Cds,temp_cpu,temp_diff,wbgt) # とりあえず投げてみる
-                time.sleep(10)
-            except:
-                print('err ambient1')
-                time.sleep(10)
-                ambient_stat(9)       # テスト　9
-                time.sleep(10)
-            print('pass ambient')
-
+            time_stamp(2)
+            print('pass data send')
+        time_stamp(5)
+        
         # 次の毎正分まで待つ
         now = time.localtime()
         minute_ago = now[4]
@@ -260,7 +227,7 @@ def main():
                 lib_LED.end_LED()
                 sys.exit()
         print('-')
-
+        time_stamp(6)
         # measu_cycleで割り切れる分になるまで待つ
         while time.localtime()[4] % measu_cycle != 0:
             time.sleep(0.2)
@@ -273,33 +240,42 @@ def main():
                 lib_LED.end_LED()
                 sys.exit()
         print('%')
-
+        time_stamp(7)
         now = time.localtime(time.time() + UTC_OFFSET)
         print("Time",now[3],":",now[4])
-        # 午前1:10にリブート +9:00しているので、補正すること
+        # 午前5:50にリブート +9:00しているので、補正すること
         if now[3] == 5 and now[4] == 50: #5:50
+            
+            # JSTに直す（日本はUTC+9）
+            t = utime.time() + 9*60*60
+            tm = utime.localtime(t)
+            # 日時を文字列に整形
+            date_str = "{:04d}-{:02d}-{:02d} {:02d}:{:02d}:{:02d}".format(
+                tm[0], tm[1], tm[2], tm[3], tm[4], tm[5]
+            )
+            print("現在日時:", date_str)
+            # ===== ファイルに保存 =====
+            with open("reboot.txt", "a") as f:
+                f.write(date_str + "\n")
+
             try:
                 time.sleep(6) 
-                ambient_stat(11)        # テスト　11
-                time.sleep(10)
                 if main_py == 1:
                     SSD1306.OLED_mes("reboot time")
                     time.sleep(60)      #最悪でも繰り返さない
                     # リブート
+                    with open("reboot_as.txt", "a") as f:
+                        f.write("2")
                     machine.reset()
                 lib_NTP.NTP_set()
                 SSD1306.OLED_mes("NTP")
                 time.sleep(60)          # テスト
-                ambient_stat(5)         # テスト　5
-                time.sleep(10)
                 print("NTP")
             except:
                 time.sleep(10)
-                ambient_stat(14)         # テスト　14
-                time.sleep(10)
-
+        time_stamp(8)
         gc.collect()  #ガーベージコレクション
-        time.sleep(2)
+        # time.sleep(2)
 
          
 if __name__=='__main__':
@@ -308,8 +284,6 @@ if __name__=='__main__':
         main()
     except:
         print("エラーが発生しました。")
-        time.sleep(10)
-        ambient_stat(12)
         time.sleep(10)
         SSD1306.OLED_mes("main err")
         time.sleep(2)
@@ -330,11 +304,11 @@ if __name__=='__main__':
 
         if main_py == 1:
             time.sleep(10)
-            ambient_stat(13) 
-            time.sleep(10)
             SSD1306.OLED_mes("reboot")
             print("main-try / リブート")
             # リブート
+            with open("reboot_as.txt", "a") as f:
+                f.write("3")
             machine.reset()
 
 """

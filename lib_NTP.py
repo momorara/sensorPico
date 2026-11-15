@@ -6,17 +6,28 @@ v1.0
 2026/08/24  日本国内のNTPサーバーに変更
 v1.1
 """
+import network
+import time
+import ntptime
 
 def NTP_set():
-    import network
-    import time
-    import ntptime
-    # 日本国内のNTPサーバーに変更
-    ntptime.host = "ntp.nict.jp"
-    #日時取得
-    ntptime.settime()
-    UTC_OFFSET = 9 * 60 * 60
-    loacal_date_time = time.localtime(time.time() + UTC_OFFSET)
-    print(loacal_date_time)
-
-# テストするのにLINEを送るなどする必要があるので、省きます。
+    try:
+        # 日本国内のNTPサーバーに変更
+        ntptime.host = "ntp.nict.jp"
+        #日時取得
+        ntptime.settime()
+        UTC_OFFSET = 9 * 60 * 60
+        loacal_date_time = time.localtime(time.time() + UTC_OFFSET)
+        print(loacal_date_time)
+    except:
+        time.sleep(3)
+        try:
+            # 日本国内のNTPサーバーに変更
+            ntptime.host = "ntp.nict.jp"
+            #日時取得
+            ntptime.settime()
+            UTC_OFFSET = 9 * 60 * 60
+            loacal_date_time = time.localtime(time.time() + UTC_OFFSET)
+            print(loacal_date_time)
+        except:
+            pass
