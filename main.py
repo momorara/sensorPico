@@ -51,7 +51,7 @@ THPCW_07.py  2026/08/28 ambiリカバリ追加
 2026/11/14
 2026/11/19  wdt追加
 
-THPCW_07から　sensorPico_01 と改名
+THPCW_07から　sensorPico_01_wdt と改名
 """
 main_py = 0 # 1の時は自己リブートを有効にする。
 
