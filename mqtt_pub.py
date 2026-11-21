@@ -48,10 +48,9 @@ def mqtt_send(topic,data):
     print(topic,data)
 
     #送信時間をずらす
-    random_value = random.uniform(1.0, 10.0)
+    random_value = random.uniform(1.0, 5.0)
     # print(random_value)
-    time.sleep(random_value)
-
+    # time.sleep(random_value)
     connect_wifi()
     client = connect_mqtt()
     try:

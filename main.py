@@ -48,20 +48,28 @@ THPCW_04.py  2025/10/01
 THPCW_07.py  2026/08/28 ambiリカバリ追加
 
 # ambient停止を受けて別サービスに移行
+2026/11/14
+2026/11/19  wdt追加
 
 THPCW_07から　sensorPico_01 と改名
 """
-main_py = 1 # 1の時は自己リブートを有効にする。
+main_py = 0 # 1の時は自己リブートを有効にする。
 
+# -*- coding: utf-8 -*-
+#!/usr/bin/python3
+# sensorPico_01.py
+# AHT10 / BMP180・BMP280 / CDS / OLED / Wi-Fi / Blynk / MiniViz / MQTT
+# WDT対応・エラー時の停止防止
 import time
+import utime
 import gc
 import sys
+import os
 import machine
-
+import rp2
 import lib_LED
 import wifi_onoff
 import config
-
 import lib_BMP1280
 import lib_AHT10
 import lib_Cds
@@ -69,262 +77,444 @@ import SSD1306
 import lib_NTP
 import lib_CPUtemp
 import lib_wbgt
-
 import mqtt_file
 import mqtt_pub
-import utime
-import os
-
 import blynk
 import MiniViz
 import wifi_connect
 
-measu_cycle = config.measu_cycle()
-wifi = config.wifi_set ()
-print( "wifi:",wifi)
+main_py = 0  # 1の時は自己リブートを有効にする
+WDT_TIMEOUT = 8000
+WDT_FEED_INTERVAL = 250
+SENSOR_RETRY = 1
+SENSOR_RETRY_WAIT = 100
+UTC_OFFSET = 9 * 60 * 60
+wdt = None
 
-led1 = machine.Pin(16, machine.Pin.OUT)
-led2 = machine.Pin(17, machine.Pin.OUT)
-led1.on()
-time.sleep(0.5)
-led2.on()
-time.sleep(0.5)
-led1.off()
-time.sleep(0.5)
-led2.off()
+# --------------------------------------------------
+# 初期設定
+# --------------------------------------------------
+try:
+    measu_cycle = int(config.measu_cycle())
+except Exception as e:
+    print("測定周期設定エラー:", e)
+    measu_cycle = 1
+if measu_cycle < 1 or measu_cycle > 60:
+    measu_cycle = 1
 
-SSID, PASS = config.ID_PASS()
+try:
+    wifi = int(config.wifi_set())
+except Exception as e:
+    print("Wi-Fi設定エラー:", e)
+    wifi = 0
+print("wifi:", wifi)
 
+try:
+    SSID, PASS = config.ID_PASS()
+except Exception as e:
+    print("Wi-Fi ID設定エラー:", e)
+    SSID, PASS = None, None
+
+# --------------------------------------------------
+# WDT
+# --------------------------------------------------
+def wdt_feed():
+    global wdt
+    if wdt is not None:
+        try:
+            wdt.feed()
+        except Exception as e:
+            print("WDT feed error:", e)
+
+def wdt_start():
+    global wdt
+    try:
+        wdt = machine.WDT(timeout=WDT_TIMEOUT)
+        wdt_feed()
+        print("WDT start:", WDT_TIMEOUT, "ms")
+    except Exception as e:
+        wdt = None
+        print("WDT start error:", e)
+
+# WDTをフィードしながら待つ
+def sleep_safe(ms):
+    end_time = time.ticks_add(time.ticks_ms(), int(ms))
+    while time.ticks_diff(end_time, time.ticks_ms()) > 0:
+        wdt_feed()
+        remain = time.ticks_diff(end_time, time.ticks_ms())
+        time.sleep_ms(min(WDT_FEED_INTERVAL, max(1, remain)))
+    wdt_feed()
+
+# --------------------------------------------------
+# 安全な関数呼び出し
+# --------------------------------------------------
+def safe_call(func, *args, default=None, name="function"):
+    try:
+        wdt_feed()
+        result = func(*args)
+        wdt_feed()
+        return result
+    except Exception as e:
+        print(name, "error:", repr(e))
+        wdt_feed()
+        return default
+
+# --------------------------------------------------
+# LED初期化
+# --------------------------------------------------
+try:
+    led1 = machine.Pin(16, machine.Pin.OUT)
+    led2 = machine.Pin(17, machine.Pin.OUT)
+    led1.on()
+    sleep_safe(500)
+    led2.on()
+    sleep_safe(500)
+    led1.off()
+    sleep_safe(500)
+    led2.off()
+except Exception as e:
+    print("LED初期化エラー:", e)
+
+# --------------------------------------------------
+# 日時ログ
+# --------------------------------------------------
 def time_stamp(no):
-    # JSTに直す（日本はUTC+9）
-    t = utime.time() + 9*60*60
-    tm = utime.localtime(t)
-    # 日時を文字列に整形
-    date_str = "{:04d}-{:02d}-{:02d} {:02d}:{:02d}:{:02d}".format(
-        tm[0], tm[1], tm[2], tm[3], tm[4], tm[5]
-    )
-    date_str = date_str + " " + str(no)
-    print("現在日時TS:", date_str)
-    # ===== ファイルに保存 =====
-    with open("time_stamp.txt", "a") as f:
-        f.write(date_str + "\n")
-    if no == -1:
-        with open("time_stamp.txt", "w") as f:
-            f.write(date_str + "\n")  
+    try:
+        t = utime.time() + UTC_OFFSET
+        tm = utime.localtime(t)
+        date_str = "{:04d}-{:02d}-{:02d} {:02d}:{:02d}:{:02d} {}".format(
+            tm[0], tm[1], tm[2], tm[3], tm[4], tm[5], no
+        )
+        print("現在日時TS:", date_str)
+        mode = "w" if no == -1 else "a"
+        with open("time_stamp.txt", mode) as f:
+            f.write(date_str + "\n")
+        wdt_feed()
+    except Exception as e:
+        print("time_stamp error:", e)
 
+# --------------------------------------------------
+# センサー測定
+# エラー時は1回だけ再試行する
+# --------------------------------------------------
+def sensor_read(func, name):
+    for attempt in range(SENSOR_RETRY + 1):
+        try:
+            wdt_feed()
+            result = func()
+            wdt_feed()
+            if result is not None:
+                return result
+            raise ValueError("センサー値がNone")
+        except Exception as e:
+            print(name, "error", attempt + 1, ":", repr(e))
+            if attempt < SENSOR_RETRY:
+                sleep_safe(SENSOR_RETRY_WAIT)
+    return None
 
-# エラーが2回続けば、データ欠損として、Noneとする。
 def keisoku():
     time_stamp(2)
-    try:
-        temp1,humi1 = lib_AHT10.aht10(1)
-        time.sleep(1)
-    except:
-        time.sleep(3)
-        try:
-            temp1,humi1 = lib_AHT10.aht10(1)
-        except:
-            temp1,humi1 = None,None
-    try:
-        temp,press1 = lib_BMP1280.BMP()
-        time.sleep(1)
-    except:
-        time.sleep(3)
-        try:
-            temp,press1 = lib_BMP1280.BMP()
-        except:
-            temp,press1 = None,None
-    return press1,temp1,humi1
-
-# bootSWの状態を見る
-import machine
-led = machine.Pin('LED', machine.Pin.OUT)
-BOOTSEL_PIN = 22
-bootsel_button = machine.Pin(BOOTSEL_PIN, machine.Pin.IN, machine.Pin.PULL_UP)
-def bootSW():
-    if rp2.bootsel_button() == 1:
-        return 1
+    aht = sensor_read(lambda: lib_AHT10.aht10(1), "AHT10")
+    if isinstance(aht, (tuple, list)) and len(aht) >= 2:
+        temp1, humi1 = aht[0], aht[1]
     else:
+        temp1, humi1 = None, None
+    bmp = sensor_read(lambda: lib_BMP1280.BMP(), "BMP")
+    if isinstance(bmp, (tuple, list)) and len(bmp) >= 2:
+        temp_bmp, press1 = bmp[0], bmp[1]
+    else:
+        temp_bmp, press1 = None, None
+    return press1, temp1, humi1
+
+# --------------------------------------------------
+# BOOTスイッチ
+# --------------------------------------------------
+def bootSW():
+    try:
+        return 1 if rp2.bootsel_button() else 0
+    except Exception:
         return 0
 
+def check_boot_switch():
+    if bootSW() == 1:
+        print("BOOTスイッチ検出: プログラム終了")
+        safe_call(lib_LED.end_LED, name="end_LED")
+        raise SystemExit
 
+# --------------------------------------------------
+# 数値チェック
+# --------------------------------------------------
+def valid_number(value):
+    return isinstance(value, (int, float)) and value == value
+
+def data_valid(temp, humi, press):
+    if not all(valid_number(v) for v in (temp, humi, press)):
+        return False
+    if temp == 100 or humi == 0 or press == 600:
+        return False
+    return True
+
+# --------------------------------------------------
+# LED表示
+# --------------------------------------------------
+def led_status(temp, humi, wbgt):
+    try:
+        led1.off()
+        led2.off()
+        if valid_number(wbgt):
+            if (25 <= wbgt < 28) or wbgt >= 31:
+                led1.on()
+            if wbgt >= 28:
+                led2.on()
+        # 冬季ウイルス警告
+        if valid_number(temp) and temp <= 17:
+            led1.on()
+        if valid_number(temp) and valid_number(humi):
+            if temp <= 20 and humi <= 45:
+                led2.on()
+    except Exception as e:
+        print("LED表示エラー:", e)
+
+# --------------------------------------------------
+# メイン処理
+# --------------------------------------------------
 def main():
-    lib_LED.LEDonoff()
-    temp,humi,press = 0,0,0
-    press,temp,humi = keisoku()
-    SSD1306.OLED(temp,humi,press)
-    # wifi 接続
+    # wdt_start()
+    safe_call(lib_LED.LEDonoff, name="LED start")
+
+    # 起動時センサー測定
+    press, temp, humi = keisoku()
+    safe_call(SSD1306.OLED, temp, humi, press, name="OLED")
+
+    # Wi-Fi接続
     ip_add = "no connect"
     if wifi == 1:
-        ip_add = wifi_onoff.wifi_onoff('on')
-        # NTP にて時刻合わせ
-        lib_NTP.NTP_set()
-        lib_LED.LEDonoff()
-        lib_LED.end_LED()
-    print("ip:",ip_add)
-    SSD1306.OLED_mes(ip_add)
-    time.sleep(10)
-
-    UTC_OFFSET = 9 * 60 * 60
+        ip_add = safe_call(
+            wifi_onoff.wifi_onoff, "on",
+            default="no connect", name="Wi-Fi接続"
+        )
+        # NTP時刻合わせ
+        safe_call(lib_NTP.NTP_set, name="NTP")
+        safe_call(lib_LED.LEDonoff, name="LED")
+        safe_call(lib_LED.end_LED, name="LED end")
+    print("ip:", ip_add)
+    safe_call(SSD1306.OLED_mes, ip_add, name="OLED message")
+    sleep_safe(10000)
+    
+    wdt_start()
     while True:
+        wdt_feed()
         time_stamp(-1)
+
+        # ------------------------------------------
         # センサー測定
-        press,temp,humi = keisoku()
-        Cds = lib_Cds.Cds(1)
-        temp_cpu = lib_CPUtemp.CPU_temp()
-        temp_diff = int((temp_cpu - temp)*10+0.5)/10
+        # ------------------------------------------
+        press, temp, humi = keisoku()
+        Cds = safe_call(lib_Cds.Cds, 1, default=None, name="CDS")
+        temp_cpu = safe_call(
+            lib_CPUtemp.CPU_temp, default=None, name="CPU temperature"
+        )
+
+        if valid_number(temp_cpu) and valid_number(temp):
+            temp_diff = int((temp_cpu - temp) * 10 + 0.5) / 10
+        else:
+            temp_diff = None
+
         time_stamp(1)
-        # 夏季 暑さ指数
-        try:
-            wbgt = lib_wbgt.calc(temp,humi)
-        except:
+
+        # ------------------------------------------
+        # WBGT
+        # ------------------------------------------
+        if valid_number(temp) and valid_number(humi):
+            wbgt = safe_call(
+                lib_wbgt.calc, temp, humi,
+                default=0, name="WBGT"
+            )
+        else:
             wbgt = 0
-        led1.off()
-        time.sleep(0.3)
-        led2.off()
-        time.sleep(0.3)
-        if (wbgt >= 25 and wbgt < 28) or wbgt >= 31 :led1.on()
-        if  wbgt >= 28                              :led2.on()
-        # 冬季ウイルス警報
-        if temp <= 17                :led1.on()
-        if temp <= 20 and humi <= 45 :led2.on()
+
+        led_status(temp, humi, wbgt)
         time_stamp(2)
 
+        # ------------------------------------------
+        # 測定結果表示
+        # ------------------------------------------
         now = time.localtime(time.time() + UTC_OFFSET)
         print(now)
-        print('気温:',temp,' 湿度:',humi,' 気圧:',press,' 明暗:',Cds,' cpuTEMP:',temp_cpu," deff_T:",temp_diff," WBGT:",wbgt)
-        SSD1306.OLED(temp,humi,press)
+        print(
+            "気温:", temp,
+            "湿度:", humi,
+            "気圧:", press,
+            "明暗:", Cds,
+            "cpuTEMP:", temp_cpu,
+            "deff_T:", temp_diff,
+            "WBGT:", wbgt
+        )
+        safe_call(SSD1306.OLED, temp, humi, press, name="OLED")
         time_stamp(4)
-        # 1つでもエラー値があれば、a投げない
-        if press != 600 and temp != 100 and humi != 0:
-            try:
-                wifi_connect.keep_alive()
-                human = 0
-                blynk.send_data(temp, humi, press, Cds, human)
-                MiniViz.send_data(temp, humi, press, Cds, human)
-                time.sleep(10)
-            except:  
-                time_stamp(2)
+
+        # ------------------------------------------
+        # データ送信
+        # それぞれ独立してエラー処理する
+        # ------------------------------------------
+        if data_valid(temp, humi, press):
+            # Wi-Fi接続維持
+            safe_call(wifi_connect.keep_alive, name="Wi-Fi keep_alive")
+            wdt_feed()
+
+            human = 0
+
+            # Blynk
+            safe_call(
+                blynk.send_data,
+                temp, humi, press, Cds, human,
+                name="Blynk"
+            )
+            sleep_safe(1000)
+
+            # MiniViz
+            safe_call(
+                MiniViz.send_data,
+                temp, humi, press, Cds, human,
+                name="MiniViz"
+            )
+            sleep_safe(1000)
+
+            # MQTT
+            topic = safe_call(
+                mqtt_file.topic_get,
+                default=None, name="MQTT topic"
+            )
+            if topic is not None:
+                print(topic)
+                safe_call(
+                    mqtt_pub.mqtt_send,
+                    topic, temp,
+                    name="MQTT send"
+                )
         else:
+            print("pass data send: センサーデータ異常")
             time_stamp(2)
-            print('pass data send')
+
         time_stamp(5)
-        
+
+        # ------------------------------------------
         # 次の毎正分まで待つ
+        # ------------------------------------------
         now = time.localtime()
         minute_ago = now[4]
         minute_now = now[4]
+
         while minute_ago == minute_now:
-            time.sleep(0.2)
+            sleep_safe(200)
             now = time.localtime()
             minute_now = now[4]
             second = now[5]
             if second % 5 == 1:
-                lib_LED.LEDonoff()
-            # bootスイッチが押されたらプログラム終了
-            if bootSW() == 1:
-                #print(bootSW())
-                lib_LED.end_LED()
-                sys.exit()
-        print('-')
+                safe_call(lib_LED.LEDonoff, name="LED")
+            check_boot_switch()
+
+        print("-")
         time_stamp(6)
-        # measu_cycleで割り切れる分になるまで待つ
+
+        # ------------------------------------------
+        # 測定周期に合う分まで待つ
+        # ------------------------------------------
         while time.localtime()[4] % measu_cycle != 0:
-            time.sleep(0.2)
+            sleep_safe(200)
             second = time.localtime()[5]
             if second % 5 == 1:
-                lib_LED.LEDonoff()
-            # bootスイッチが押されたらプログラム終了
-            if bootSW() == 1:
-                #print(bootSW())
-                lib_LED.end_LED()
-                sys.exit()
-        print('%')
+                safe_call(lib_LED.LEDonoff, name="LED")
+            check_boot_switch()
+
+        print("%")
         time_stamp(7)
+
         now = time.localtime(time.time() + UTC_OFFSET)
-        print("Time",now[3],":",now[4])
-        # 午前5:50にリブート +9:00しているので、補正すること
-        if now[3] == 5 and now[4] == 50: #5:50
-            
-            # JSTに直す（日本はUTC+9）
-            t = utime.time() + 9*60*60
-            tm = utime.localtime(t)
-            # 日時を文字列に整形
-            date_str = "{:04d}-{:02d}-{:02d} {:02d}:{:02d}:{:02d}".format(
-                tm[0], tm[1], tm[2], tm[3], tm[4], tm[5]
-            )
-            print("現在日時:", date_str)
-            # ===== ファイルに保存 =====
-            with open("reboot.txt", "a") as f:
-                f.write(date_str + "\n")
+        print("Time", now[3], ":", now[4])
 
+        # ------------------------------------------
+        # 午前5:50 定時リブート
+        # ------------------------------------------
+        if now[3] == 5 and now[4] == 50:
             try:
-                time.sleep(6) 
-                if main_py == 1:
-                    SSD1306.OLED_mes("reboot time")
-                    time.sleep(60)      #最悪でも繰り返さない
-                    # リブート
-                    with open("reboot_as.txt", "a") as f:
-                        f.write("2")
-                    machine.reset()
-                lib_NTP.NTP_set()
-                SSD1306.OLED_mes("NTP")
-                time.sleep(60)          # テスト
-                print("NTP")
-            except:
-                time.sleep(10)
-        time_stamp(8)
-        gc.collect()  #ガーベージコレクション
-        # time.sleep(2)
+                date_str = "{:04d}-{:02d}-{:02d} {:02d}:{:02d}:{:02d}".format(
+                    now[0], now[1], now[2], now[3], now[4], now[5]
+                )
+                print("現在日時:", date_str)
+                with open("reboot.txt", "a") as f:
+                    f.write(date_str + "\n")
 
-         
-if __name__=='__main__':
-    # main()
+                sleep_safe(6000)
+
+                if main_py == 1:
+                    safe_call(
+                        SSD1306.OLED_mes, "reboot",
+                        name="OLED reboot"
+                    )
+                    sleep_safe(60000)
+                    with open("reboot_as.txt", "a") as f:
+                        f.write("2\n")
+                    machine.reset()
+
+                safe_call(lib_NTP.NTP_set, name="定時NTP")
+                safe_call(
+                    SSD1306.OLED_mes, "NTP",
+                    name="OLED NTP"
+                )
+                sleep_safe(60000)
+                print("NTP")
+            except Exception as e:
+                print("定時処理エラー:", repr(e))
+                sleep_safe(1000)
+
+        time_stamp(8)
+        gc.collect()
+        wdt_feed()
+
+# --------------------------------------------------
+# 起動
+# --------------------------------------------------
+if __name__ == "__main__":
     try:
         main()
-    except:
-        print("エラーが発生しました。")
-        time.sleep(10)
-        SSD1306.OLED_mes("main err")
-        time.sleep(2)
-        print("main-try /main_py:",main_py)
-        # 想定されていないエラーが発生してmainがこけた場合
-        # ここに来て、リブートするが、エラーが継続している場合ループしてしまう。
-        # そんな時は、リブートする前にbootスイッチを押すことで、プログラムを終了させる。
+    except SystemExit:
+        print("プログラムを終了しました。")
+        safe_call(lib_LED.end_LED, name="LED end")
+    except Exception as e:
+        print("メインプログラムエラー:", repr(e))
+        safe_call(
+            SSD1306.OLED_mes, "main err",
+            name="OLED main error"
+        )
+        sleep_safe(2000)
+        print("main-try / main_py:", main_py)
+
+        # エラー後もBOOTスイッチで終了できるようにする
         for i in range(10):
+            wdt_feed()
             if bootSW() == 1:
-                #print(bootSW())
-                lib_LED.end_LED()
-                sys.exit()
-                main_py = 0
-            lib_LED.LEDonoff()
-            print("main-try /i:", i)
-            mes = "main-try /i:" + str(i)
-            SSD1306.OLED_mes(mes)
+                safe_call(lib_LED.end_LED, name="LED end")
+                raise SystemExit
+            safe_call(lib_LED.LEDonoff, name="LED")
+            print("main-try / i:", i)
+            safe_call(
+                SSD1306.OLED_mes,
+                "main-try / i:" + str(i),
+                name="OLED error message"
+            )
+            sleep_safe(500)
 
         if main_py == 1:
-            time.sleep(10)
-            SSD1306.OLED_mes("reboot")
+            sleep_safe(10000)
+            safe_call(
+                SSD1306.OLED_mes, "reboot",
+                name="OLED reboot"
+            )
             print("main-try / リブート")
-            # リブート
-            with open("reboot_as.txt", "a") as f:
-                f.write("3")
+            try:
+                with open("reboot_as.txt", "a") as f:
+                    f.write("3\n")
+            except Exception as e:
+                print("reboot log error:", e)
             machine.reset()
-
-"""
-ambient_statによるエラー情報等の表示
-1 通常
-2 ambient送信異常 1回目
-3 ambient送信異常 2回目
-4 ambient送信異常 3回目
-5 定時リブート未実行時NTP
-6 温度異常
-7 湿度異常
-8 データ異常時のambient送信
-9 データ異常時のambient送信異常
-10 main start
-11 定時リブート
-12 mainエラー
-13 mainエラー時のリブート
-14 定時リブート失敗
-"""

@@ -1,8 +1,19 @@
-from micropython import const
-from ustruct import unpack as unp
 
-import machine 
-import time
+"""
+BMP280 センサーライブラリ
+MicroPython / Raspberry Pi Pico W
+2023/05/10
+2026/11/19 エラー対策・WDT対策
+元の BMP280 クラスと関数名を維持。
+bmp280_dataRead() の呼び出し方法を維持。
+温度・気圧を一度のI2C読み取りで取得。
+センサー初期化・通信エラーに対応。
+気圧990hPa未満の場合は1回だけ再測定。
+エラー時は (None, None) を返す。
+Pico WのI2Cタイムアウトを100msに設定。
+不要な再初期化と通信を削減。
+無限リトライを排除。
+"""
 
 # Author David Stenwall (david at stenwall.io)
 # https://github.com/dafvid/micropython-bmp280
@@ -30,35 +41,30 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 """
-
+from micropython import const
+from ustruct import unpack as unp
+import machine
+import time
 import config
-i2c_no,SDA_pin = config.i2c_ini()
-# センサー補正値
-T_hosei,H_hosei,P_hosei = config.hosei()
 
-# Power Modes
+# BMP280設定
 BMP280_POWER_SLEEP = const(0)
 BMP280_POWER_FORCED = const(1)
 BMP280_POWER_NORMAL = const(3)
-
 BMP280_SPI3W_ON = const(1)
 BMP280_SPI3W_OFF = const(0)
-
 BMP280_TEMP_OS_SKIP = const(0)
 BMP280_TEMP_OS_1 = const(1)
 BMP280_TEMP_OS_2 = const(2)
 BMP280_TEMP_OS_4 = const(3)
 BMP280_TEMP_OS_8 = const(4)
 BMP280_TEMP_OS_16 = const(5)
-
 BMP280_PRES_OS_SKIP = const(0)
 BMP280_PRES_OS_1 = const(1)
 BMP280_PRES_OS_2 = const(2)
 BMP280_PRES_OS_4 = const(3)
 BMP280_PRES_OS_8 = const(4)
 BMP280_PRES_OS_16 = const(5)
-
-# Standby settings in ms
 BMP280_STANDBY_0_5 = const(0)
 BMP280_STANDBY_62_5 = const(1)
 BMP280_STANDBY_125 = const(2)
@@ -67,23 +73,24 @@ BMP280_STANDBY_500 = const(4)
 BMP280_STANDBY_1000 = const(5)
 BMP280_STANDBY_2000 = const(6)
 BMP280_STANDBY_4000 = const(7)
-
-# IIR Filter setting
 BMP280_IIR_FILTER_OFF = const(0)
 BMP280_IIR_FILTER_2 = const(1)
 BMP280_IIR_FILTER_4 = const(2)
 BMP280_IIR_FILTER_8 = const(3)
 BMP280_IIR_FILTER_16 = const(4)
-
-# Oversampling setting
 BMP280_OS_ULTRALOW = const(0)
 BMP280_OS_LOW = const(1)
 BMP280_OS_STANDARD = const(2)
 BMP280_OS_HIGH = const(3)
 BMP280_OS_ULTRAHIGH = const(4)
+BMP280_CASE_HANDHELD_LOW = const(0)
+BMP280_CASE_HANDHELD_DYN = const(1)
+BMP280_CASE_WEATHER = const(2)
+BMP280_CASE_FLOOR = const(3)
+BMP280_CASE_DROP = const(4)
+BMP280_CASE_INDOOR = const(5)
 
-# Oversampling matrix
-# (PRESS_OS, TEMP_OS, sample time in ms)
+# オーバーサンプリング設定
 _BMP280_OS_MATRIX = [
     [BMP280_PRES_OS_1, BMP280_TEMP_OS_1, 7],
     [BMP280_PRES_OS_2, BMP280_TEMP_OS_1, 9],
@@ -92,14 +99,7 @@ _BMP280_OS_MATRIX = [
     [BMP280_PRES_OS_16, BMP280_TEMP_OS_2, 44]
 ]
 
-# Use cases
-BMP280_CASE_HANDHELD_LOW = const(0)
-BMP280_CASE_HANDHELD_DYN = const(1)
-BMP280_CASE_WEATHER = const(2)
-BMP280_CASE_FLOOR = const(3)
-BMP280_CASE_DROP = const(4)
-BMP280_CASE_INDOOR = const(5)
-
+# 使用条件設定
 _BMP280_CASE_MATRIX = [
     [BMP280_POWER_NORMAL, BMP280_OS_ULTRAHIGH, BMP280_IIR_FILTER_4, BMP280_STANDBY_62_5],
     [BMP280_POWER_NORMAL, BMP280_OS_STANDARD, BMP280_IIR_FILTER_16, BMP280_STANDBY_0_5],
@@ -109,49 +109,39 @@ _BMP280_CASE_MATRIX = [
     [BMP280_POWER_NORMAL, BMP280_OS_ULTRAHIGH, BMP280_IIR_FILTER_16, BMP280_STANDBY_0_5]
 ]
 
+# レジスタ
 _BMP280_REGISTER_ID = const(0xD0)
 _BMP280_REGISTER_RESET = const(0xE0)
 _BMP280_REGISTER_STATUS = const(0xF3)
 _BMP280_REGISTER_CONTROL = const(0xF4)
-_BMP280_REGISTER_CONFIG = const(0xF5)  # IIR filter config
-
+_BMP280_REGISTER_CONFIG = const(0xF5)
 _BMP280_REGISTER_DATA = const(0xF7)
 
-
+# --------------------------------------------------
+# BMP280クラス
+# --------------------------------------------------
 class BMP280:
     def __init__(self, i2c_bus, addr=0x76, use_case=BMP280_CASE_HANDHELD_DYN):
         self._bmp_i2c = i2c_bus
         self._i2c_addr = addr
-
-        # read calibration data
-        # < little-endian
-        # H unsigned short
-        # h signed short
-        self._T1 = unp('<H', self._read(0x88, 2))[0]
-        self._T2 = unp('<h', self._read(0x8A, 2))[0]
-        self._T3 = unp('<h', self._read(0x8C, 2))[0]
-        self._P1 = unp('<H', self._read(0x8E, 2))[0]
-        self._P2 = unp('<h', self._read(0x90, 2))[0]
-        self._P3 = unp('<h', self._read(0x92, 2))[0]
-        self._P4 = unp('<h', self._read(0x94, 2))[0]
-        self._P5 = unp('<h', self._read(0x96, 2))[0]
-        self._P6 = unp('<h', self._read(0x98, 2))[0]
-        self._P7 = unp('<h', self._read(0x9A, 2))[0]
-        self._P8 = unp('<h', self._read(0x9C, 2))[0]
-        self._P9 = unp('<h', self._read(0x9E, 2))[0]
-
-        # output raw
+        # 校正データを一括読み込み
+        d = self._read(0x88, 24)
+        if len(d) != 24:
+            raise OSError("BMP280校正データ異常")
+        c = unp('<HhhHhhhhhhhh', d)
+        (self._T1, self._T2, self._T3, self._P1,
+         self._P2, self._P3, self._P4, self._P5,
+         self._P6, self._P7, self._P8, self._P9) = c
+        if self._P1 == 0:
+            raise ValueError("BMP280校正データ異常")
         self._t_raw = 0
+        self._p_raw = 0
         self._t_fine = 0
         self._t = 0
-
-        self._p_raw = 0
         self._p = 0
-
-        self.read_wait_ms = 0  # interval between forced measure and readout
-        self._new_read_ms = 200  # interval between
+        self.read_wait_ms = 0
+        self._new_read_ms = 200
         self._last_read_ts = 0
-
         if use_case is not None:
             self.use_case(use_case)
 
@@ -159,18 +149,16 @@ class BMP280:
         return self._bmp_i2c.readfrom_mem(self._i2c_addr, addr, size)
 
     def _write(self, addr, b_arr):
-        if not type(b_arr) is bytearray:
+        if not isinstance(b_arr, (bytearray, bytes)):
             b_arr = bytearray([b_arr])
         return self._bmp_i2c.writeto_mem(self._i2c_addr, addr, b_arr)
 
     def _gauge(self):
-        # TODO limit new reads
-        # read all data at once (as by spec)
         d = self._read(_BMP280_REGISTER_DATA, 6)
-
-        self._p_raw = (d[0] << 12) + (d[1] << 4) + (d[2] >> 4)
-        self._t_raw = (d[3] << 12) + (d[4] << 4) + (d[5] >> 4)
-
+        if len(d) != 6:
+            raise OSError("BMP280読み取りデータ異常")
+        self._p_raw = (d[0] << 12) | (d[1] << 4) | (d[2] >> 4)
+        self._t_raw = (d[3] << 12) | (d[4] << 4) | (d[5] >> 4)
         self._t_fine = 0
         self._t = 0
         self._p = 0
@@ -195,73 +183,62 @@ class BMP280:
     def load_test_data(self):
         self._t_raw = 519888
         self._p_raw = 415148
+        self._t_fine = 0
+        self._t = 0
+        self._p = 0
 
     def print_calibration(self):
-        print("T1: {} {}".format(self._T1, type(self._T1)))
-        print("T2: {} {}".format(self._T2, type(self._T2)))
-        print("T3: {} {}".format(self._T3, type(self._T3)))
-        print("P1: {} {}".format(self._P1, type(self._P1)))
-        print("P2: {} {}".format(self._P2, type(self._P2)))
-        print("P3: {} {}".format(self._P3, type(self._P3)))
-        print("P4: {} {}".format(self._P4, type(self._P4)))
-        print("P5: {} {}".format(self._P5, type(self._P5)))
-        print("P6: {} {}".format(self._P6, type(self._P6)))
-        print("P7: {} {}".format(self._P7, type(self._P7)))
-        print("P8: {} {}".format(self._P8, type(self._P8)))
-        print("P9: {} {}".format(self._P9, type(self._P9)))
+        for name in ('T1', 'T2', 'T3', 'P1', 'P2', 'P3',
+                     'P4', 'P5', 'P6', 'P7', 'P8', 'P9'):
+            v = getattr(self, '_' + name)
+            print("{}: {} {}".format(name, v, type(v)))
 
     def _calc_t_fine(self):
-        # From datasheet page 22
-        self._gauge()
         if self._t_fine == 0:
             var1 = (((self._t_raw >> 3) - (self._T1 << 1)) * self._T2) >> 11
-            var2 = (((((self._t_raw >> 4) - self._T1)
-                      * ((self._t_raw >> 4)
-                         - self._T1)) >> 12)
-                    * self._T3) >> 14
+            var2 = (((((self._t_raw >> 4) - self._T1) ** 2) >> 12) * self._T3) >> 14
             self._t_fine = var1 + var2
+
+    def _calculate(self):
+        self._calc_t_fine()
+        self._t = ((self._t_fine * 5 + 128) >> 8) / 100.0
+        var1 = self._t_fine - 128000
+        var2 = var1 * var1 * self._P6
+        var2 += (var1 * self._P5) << 17
+        var2 += self._P4 << 35
+        var1 = ((var1 * var1 * self._P3) >> 8) + ((var1 * self._P2) << 12)
+        var1 = (((1 << 47) + var1) * self._P1) >> 33
+        if var1 == 0:
+            self._p = 0
+            return
+        p = 1048576 - self._p_raw
+        p = int((((p << 31) - var2) * 3125) / var1)
+        var1 = (self._P9 * (p >> 13) * (p >> 13)) >> 25
+        var2 = (self._P8 * p) >> 19
+        p = ((p + var1 + var2) >> 8) + (self._P7 << 4)
+        self._p = p / 256.0
 
     @property
     def temperature(self):
-        self._calc_t_fine()
-        if self._t == 0:
-            self._t = ((self._t_fine * 5 + 128) >> 8) / 100.
+        self._gauge()
+        self._calculate()
         return self._t
 
     @property
     def pressure(self):
-        # From datasheet page 22
-        self._calc_t_fine()
-        if self._p == 0:
-            var1 = self._t_fine - 128000
-            var2 = var1 * var1 * self._P6
-            var2 = var2 + ((var1 * self._P5) << 17)
-            var2 = var2 + (self._P4 << 35)
-            var1 = ((var1 * var1 * self._P3) >> 8) + ((var1 * self._P2) << 12)
-            var1 = (((1 << 47) + var1) * self._P1) >> 33
-
-            if var1 == 0:
-                return 0
-
-            p = 1048576 - self._p_raw
-            p = int((((p << 31) - var2) * 3125) / var1)
-            var1 = (self._P9 * (p >> 13) * (p >> 13)) >> 25
-            var2 = (self._P8 * p) >> 19
-
-            p = ((p + var1 + var2) >> 8) + (self._P7 << 4)
-            self._p = p / 256.0
+        self._gauge()
+        self._calculate()
         return self._p
 
     def _write_bits(self, address, value, length, shift=0):
         d = self._read(address)[0]
-        m = int('1' * length, 2) << shift
-        d &= ~m
-        d |= m & value << shift
+        mask = ((1 << length) - 1) << shift
+        d = (d & ~mask) | ((value << shift) & mask)
         self._write(address, d)
 
     def _read_bits(self, address, length, shift=0):
         d = self._read(address)[0]
-        return d >> shift & int('1' * length, 2)
+        return (d >> shift) & ((1 << length) - 1)
 
     @property
     def standby(self):
@@ -269,7 +246,8 @@ class BMP280:
 
     @standby.setter
     def standby(self, v):
-        assert 0 <= v <= 7
+        if not 0 <= v <= 7:
+            raise ValueError("standby設定範囲エラー")
         self._write_bits(_BMP280_REGISTER_CONFIG, v, 3, 5)
 
     @property
@@ -278,7 +256,8 @@ class BMP280:
 
     @iir.setter
     def iir(self, v):
-        assert 0 <= v <= 4
+        if not 0 <= v <= 4:
+            raise ValueError("iir設定範囲エラー")
         self._write_bits(_BMP280_REGISTER_CONFIG, v, 3, 2)
 
     @property
@@ -287,7 +266,8 @@ class BMP280:
 
     @spi3w.setter
     def spi3w(self, v):
-        assert v in (0, 1)
+        if v not in (0, 1):
+            raise ValueError("spi3w設定エラー")
         self._write_bits(_BMP280_REGISTER_CONFIG, v, 1)
 
     @property
@@ -296,7 +276,8 @@ class BMP280:
 
     @temp_os.setter
     def temp_os(self, v):
-        assert 0 <= v <= 5
+        if not 0 <= v <= 5:
+            raise ValueError("temp_os設定範囲エラー")
         self._write_bits(_BMP280_REGISTER_CONTROL, v, 3, 5)
 
     @property
@@ -305,7 +286,8 @@ class BMP280:
 
     @press_os.setter
     def press_os(self, v):
-        assert 0 <= v <= 5
+        if not 0 <= v <= 5:
+            raise ValueError("press_os設定範囲エラー")
         self._write_bits(_BMP280_REGISTER_CONTROL, v, 3, 2)
 
     @property
@@ -314,7 +296,8 @@ class BMP280:
 
     @power_mode.setter
     def power_mode(self, v):
-        assert 0 <= v <= 3
+        if not 0 <= v <= 3:
+            raise ValueError("power_mode設定範囲エラー")
         self._write_bits(_BMP280_REGISTER_CONTROL, v, 2)
 
     @property
@@ -343,40 +326,74 @@ class BMP280:
         self.power_mode = BMP280_POWER_SLEEP
 
     def use_case(self, uc):
-        assert 0 <= uc <= 5
+        if not 0 <= uc <= 5:
+            raise ValueError("use_case設定範囲エラー")
         pm, oss, iir, sb = _BMP280_CASE_MATRIX[uc]
         p_os, t_os, self.read_wait_ms = _BMP280_OS_MATRIX[oss]
-        self._write(_BMP280_REGISTER_CONFIG, (iir << 2) + (sb << 5))
-        self._write(_BMP280_REGISTER_CONTROL, pm + (p_os << 2) + (t_os << 5))
+        self._write(_BMP280_REGISTER_CONFIG, (iir << 2) | (sb << 5))
+        self._write(_BMP280_REGISTER_CONTROL, pm | (p_os << 2) | (t_os << 5))
 
     def oversample(self, oss):
-        assert 0 <= oss <= 4
+        if not 0 <= oss <= 4:
+            raise ValueError("oversample設定範囲エラー")
         p_os, t_os, self.read_wait_ms = _BMP280_OS_MATRIX[oss]
-        self._write_bits(_BMP280_REGISTER_CONTROL, p_os + (t_os << 3), 2)
+        self._write_bits(_BMP280_REGISTER_CONTROL, p_os | (t_os << 3), 6)
 
-
+# --------------------------------------------------
+# BMP280データ取得
+# --------------------------------------------------
 def bmp280_dataRead():
-    i2c = machine.I2C(0)
-    bmp = BMP280(i2c)
-    temp = bmp.temperature
-    press = bmp.pressure/100
+    try:
+        # 設定取得
+        i2c_no, SDA_pin = config.i2c_ini()
+        T_hosei, H_hosei, P_hosei = config.hosei()
+        # I2C初期化（Pico W：タイムアウト100ms）
+        i2c = machine.I2C(
+            i2c_no,
+            sda=machine.Pin(SDA_pin),
+            scl=machine.Pin(SDA_pin + 1),
+            timeout=100000
+        )
+        # I2Cスキャンは1回だけ
+        devices = i2c.scan()
+        if 0x76 in devices:
+            addr = 0x76
+        elif 0x77 in devices:
+            addr = 0x77
+        else:
+            raise OSError("BMP280が見つかりません")
+        # センサー初期化
+        bmp = BMP280(i2c, addr)
+        if bmp.chip_id[0] != 0x58:
+            raise OSError("BMP280ではありません")
+        # 温度・気圧を同時取得
+        bmp._gauge()
+        bmp._calculate()
+        temp = bmp._t
+        press = bmp._p / 100.0
+        # 気圧が低い場合は1回だけ再測定
+        if press < 990:
+            time.sleep_ms(400)
+            bmp._gauge()
+            bmp._calculate()
+            temp = bmp._t
+            press = bmp._p / 100.0
+        return temp, press + P_hosei
+    except Exception as e:
+        print("BMP280読み取りエラー:", e)
+        return None, None
 
-    # 990以下の数字が出たら再度計測
-    # 電源投入時1回だけ低い値の出る個体があるため
-    if press < 990:
-        time.sleep(0.4)
-        bmp = BMP280(i2c)
-        temp = bmp.temperature
-        press = bmp.pressure/100
-    return temp, press + P_hosei
-
-
+# --------------------------------------------------
+# 動作確認
+# --------------------------------------------------
 def main():
     while True:
         temp, press = bmp280_dataRead()
-        print("Temperature: {:.2f} °C".format(temp))
-        print("Pressure: {:.2f} hPa".format(press))
-        
+        if temp is not None and press is not None:
+            print("Temperature: {:.2f} °C".format(temp))
+            print("Pressure: {:.2f} hPa".format(press))
+        else:
+            print("BMP280データ取得失敗")
         time.sleep(2)
 
 if __name__ == '__main__':
